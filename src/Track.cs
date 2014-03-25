@@ -107,6 +107,11 @@ namespace Trackar
 		{
 			foreach (WheelDummy wheel in WheelDummies)
 			{
+				if (wheel.Collider.isGrounded)
+				{
+					RealRPM = wheel.Collider.rpm * wheel.Collider.radius;
+					RPM = Mathf.Abs (RealRPM);
+				}
 				wheel.Susp = Susp;
 				wheel.PhysUpdate ();
 			}
@@ -152,11 +157,6 @@ namespace Trackar
 			foreach (WheelDummy wheelDummy in WheelDummies)
 			{
 				wheelDummy.Collider.motorTorque = torque;
-				if (wheelDummy.Collider.isGrounded)
-				{
-					RealRPM = wheelDummy.Collider.rpm * wheelDummy.Collider.radius;
-					RPM = Mathf.Abs (RealRPM);
-				}
 			}
 		}
 	}
