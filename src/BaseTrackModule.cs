@@ -65,7 +65,7 @@ namespace Trackar
 
 		public ConfigContainer TrackConfig;
 
-		public BaseTrackModule()
+		public void InitBaseTrackModule()
 		{
 			TrackConfig.TrackSections = TrackSections;
 			TrackConfig.TrackWidth = TrackWidth;
@@ -100,6 +100,7 @@ namespace Trackar
 				if (action.guiName.ToString () == "Toggle Cruise Control")
 					CruiseActionGroup = action.actionGroup;
 			}
+			InitBaseTrackModule ();
 		}
 
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]

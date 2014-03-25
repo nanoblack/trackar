@@ -48,6 +48,9 @@ namespace Trackar
 			spring.targetPosition = Susp.TravelCenter;
 			spring.damper = Susp.Damper;
 			Collider.suspensionSpring = spring; // UGH this feels hacky
+
+			//WheelModel.transform.position = Collider.transform.position; // temp hack for possibly getting some visual feedback for suspension
+			// ^ the results of this make no sense to me, but are not at all what is intended
 		}
 	}
 }
