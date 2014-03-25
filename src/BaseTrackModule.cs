@@ -56,9 +56,9 @@ namespace Trackar
 		public float CruiseTargetRPM = 0;
 		public KSPActionGroup CruiseActionGroup;
 
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTargetPosition"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTargetPosition"), UI_FloatRange(minValue = -4, maxValue = 0, stepIncrement = 0.25f)]
 		public float dbgTargetPosition = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTravel"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTravel"), UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
 		public float dbgTravel = 0;
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgDamping"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
 		public float dbgDamping = 0;
