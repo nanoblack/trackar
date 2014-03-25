@@ -1,3 +1,9 @@
+//=============================================================
+// All you do is take, take, takin' off the little that
+// You got on, goin' on, I'd rather be eating glass
+// Stick hot needles in my eyes, go ahead and tap that ass 
+//=============================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
