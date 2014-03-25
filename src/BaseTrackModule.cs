@@ -13,7 +13,7 @@ namespace Trackar
 		public float TrackWidth = 1;
 
 		public float TrackSections = 4;
-
+		[KSPField]
 		public float TrackLength = 15;
 
 		public float TrackThickness = 0.0f;
