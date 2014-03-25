@@ -1,0 +1,7 @@
+*.sln
+*.csproj
+*.userprefs
+*.mdb
+*.dll
+!Trackar.dll
+obj/
