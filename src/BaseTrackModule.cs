@@ -46,6 +46,8 @@ namespace Trackar
 
 		public bool bIsMirrorInstance = false;
 
+		// I'd say this list is unnecessary but it does make it simple for this base class to implement common methods that interact with Track instances regardless of count
+		// It is a bit excessive though
 		public List<Track> Tracks = new List<Track>();
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
@@ -54,9 +56,16 @@ namespace Trackar
 		public float CruiseTargetRPM = 0;
 		public KSPActionGroup CruiseActionGroup;
 
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTargetPosition"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
+		public float dbgTargetPosition = 0;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTravel"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
+		public float dbgTravel = 0;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgDamping"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
+		public float dbgDamping = 0;
+
 		public ConfigContainer TrackConfig;
 
-		public void BuildTrackConfig()
+		public BaseTrackModule()
 		{
 			TrackConfig.TrackSections = TrackSections;
 			TrackConfig.TrackWidth = TrackWidth;
@@ -78,12 +87,6 @@ namespace Trackar
 			TrackConfig.SingleTrackRoot = "";
 		}
 
-		public void DispatchAnimsUpdate()
-		{
-			foreach(Track track in Tracks)
-				track.DoMovementAnims ();
-		}
-
 		public override void OnStart(StartState state)
 		{
 			foreach (Transform tempCol in part.FindModelTransforms("sideCollider"))
@@ -97,8 +100,6 @@ namespace Trackar
 				if (action.guiName.ToString () == "Toggle Cruise Control")
 					CruiseActionGroup = action.actionGroup;
 			}
-
-			BuildTrackConfig ();
 		}
 
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
@@ -140,13 +141,25 @@ namespace Trackar
 
 		public virtual void FixedUpdate ()
 		{
-			//DispatchSuspension ();
+			SuspConfig susp;
+			susp.Damper = dbgDamping;
+			susp.TravelCenter = dbgTargetPosition;
+			susp.Travel = dbgTravel;
+
+			foreach (Track track in Tracks)
+			{
+				track.Susp = susp;
+				track.PhysUpdate ();
+			}
 		}
 
 		public override void OnUpdate ()
 		{
-			if(HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
-				DispatchAnimsUpdate ();
+			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
+			{
+				foreach (Track track in Tracks)
+					track.Update ();
+			}
 
 			if(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor)
 				//DispatchProceduralUpdate ();

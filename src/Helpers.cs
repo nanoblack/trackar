@@ -37,6 +37,13 @@ namespace Trackar
 		public string SingleTrackRoot;
 	}
 
+	public struct SuspConfig
+	{
+		public float Travel;
+		public float TravelCenter;
+		public float Damper;
+	}
+
 	public struct ProcVars
 	{
 		public float Width;
@@ -44,7 +51,7 @@ namespace Trackar
 
 	public static class Debuggar
 	{
-		public const bool bIsDebugMode = false;
+		public const bool bIsDebugMode = true;
 
 		public static void Message(string message)
 		{

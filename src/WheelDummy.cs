@@ -18,6 +18,8 @@ namespace Trackar
 		public Transform Joint { get { return _joint; } }
 		public GameObject WheelModel { get { return _model; } }
 
+		public SuspConfig Susp;
+
 		private WheelCollider _collider;
 		private Transform _joint;
 		private GameObject _model;
@@ -37,6 +39,15 @@ namespace Trackar
 			float delta = deg * Time.deltaTime;
 			float rot = delta / Collider.radius;
 			WheelModel.transform.Rotate(Vector3.right, rot);
+		}
+
+		public void PhysUpdate()
+		{
+			Collider.suspensionDistance = Susp.Travel;
+			JointSpring spring = Collider.suspensionSpring;
+			spring.targetPosition = Susp.TravelCenter;
+			spring.damper = Susp.Damper;
+			Collider.suspensionSpring = spring; // UGH this feels hacky
 		}
 	}
 }

@@ -32,6 +32,8 @@ namespace Trackar
 
 		public ConfigContainer Config;
 
+		public SuspConfig Susp;
+
 		public Track(Transform transform, ConfigContainer configContainer, bool mirror)
 		{
 			Debuggar.Message ("New Track instantiated");
@@ -101,7 +103,16 @@ namespace Trackar
 			bIsMirror = mirror;
 		}
 
-		public void DoMovementAnims()
+		public void PhysUpdate()
+		{
+			foreach (WheelDummy wheel in WheelDummies)
+			{
+				wheel.Susp = Susp;
+				wheel.PhysUpdate ();
+			}
+		}
+
+		public void Update()
 		{
 			float distanceTravelled = (float)((RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
 			Material trackMaterial = TrackSurface.renderer.material;
