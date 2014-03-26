@@ -42,7 +42,7 @@ namespace Trackar
 			WheelModel.transform.Rotate(Vector3.right, rot);
 		}
 
-		public void PhysUpdate()
+		/*public void PhysUpdate()
 		{
 			Collider.suspensionDistance = Susp.Travel;
 			JointSpring spring = Collider.suspensionSpring;
@@ -52,7 +52,7 @@ namespace Trackar
 
 			//WheelModel.transform.position = Collider.transform.position; // temp hack for possibly getting some visual feedback for suspension
 			// ^ the results of this make no sense to me, but are not at all what is intended
-		}
+		}*/
 	}
 }
 

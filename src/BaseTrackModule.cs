@@ -116,12 +116,12 @@ namespace Trackar
 				}
 
 				foreach (Track track in Tracks)
-					track.EngageBrake ();
+					track.Brakes (true);
 			}
 			else
 			{
 				foreach (Track track in Tracks)
-					track.ReleaseBrake ();
+					track.Brakes (false);
 			}
 		}
 
@@ -151,7 +151,8 @@ namespace Trackar
 			foreach (Track track in Tracks)
 			{
 				//track.Susp = susp;
-				track.PhysUpdate ();
+				track.FixedUpdate ();
+
 			}
 		}
 
