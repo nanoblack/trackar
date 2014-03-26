@@ -33,13 +33,13 @@ namespace Trackar
 
 
 		[KSPField]
-		public string WheelModelName = "RoadWheel";
+		public string WheelModelName;
 		[KSPField]
-		public string WheelColliderName = "WheelCollider";
+		public string WheelColliderName;
 		[KSPField]
-		public string TrackSurfaceName = "TrackSurface";
+		public string TrackSurfaceName;
 		[KSPField]
-		public string SuspJointName = "joint";
+		public string SuspJointName;
 
 
 		public bool bAreBrakesEngaged = false;
