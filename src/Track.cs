@@ -31,8 +31,6 @@ namespace Trackar
 
 		public TrackConfigContainer Config;
 
-		//public SuspConfig Susp;
-
 		public Track(Transform transform, TrackConfigContainer configContainer, bool mirror)
 		{
 			Config = configContainer;
@@ -44,23 +42,23 @@ namespace Trackar
 			WidthScale = Config.Width;
 
 			Component[] components = Root.GetComponentsInChildren<Component> ();
-			//Debuggar.Message ("Fetching Components: " + components.Count ().ToString ());
 
 			WheelDummies = new WheelDummyList (components, Config.WheelDummyConfig, Config.ModelConfig);
 
+			// this can probably be slimmed down a bit, a full blown foreach isn't needed here anymore
 			foreach (Component o in components)
 			{
 				if (o.name.StartsWith (Config.ModelConfig.TrackSurface))
-				{
 					TrackSurface = o as SkinnedMeshRenderer;
-					//Debuggar.Message ("Found track surface: " + o.name);
-				}
 			}
+
 			TrackSurfaceTransform = Root.transform.Find (Config.ModelConfig.TrackSurface);
+
 			if (TrackSurfaceTransform == null)
 				Debuggar.Error ("TrackSurfaceTransform is null");
 
 			bIsMirror = mirror;
+
 			Debuggar.Message ("Track spawned");
 		}
 

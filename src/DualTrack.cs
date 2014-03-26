@@ -49,11 +49,9 @@ namespace Trackar
 
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				//Debuggar.Message ("Instantiating new Track: " + LeftTrackRoot);
 				LeftTrack = new Track (part.FindModelTransform (LeftTrackRoot), TrackConfig, true);
 				Tracks.Add (LeftTrack);
 
-				//Debuggar.Message ("Instantiating new Track: " + RightTrackRoot);
 				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, false);
 				Tracks.Add (RightTrack);
 			}

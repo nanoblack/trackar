@@ -33,26 +33,25 @@ namespace Trackar
 
 			Config = config; // lolcase
 
+			// does this need to be a foreach anymore? surely there are much more efficient ways to do it
+			// although does it matter, it's not like it's per-frame
 			foreach(Component o in components)
 			{
 				if (o.name.StartsWith (modelConfig.WheelModel) && o is MeshFilter)
 				{
 					int wheelNumber = Convert.ToInt32 (o.name.Substring (modelConfig.WheelModel.Length));
-					//Debuggar.Message ("Building wheelObjects: name " + o.name + " ID " + wheelNumber.ToString());
 					wheelObjects.Add (wheelNumber, o.gameObject);
 				}
 
 				if (o.name.StartsWith (modelConfig.WheelCollider) && o is WheelCollider)
 				{
 					int wheelNumber = Convert.ToInt32 (o.name.Substring (modelConfig.WheelCollider.Length));
-					//Debuggar.Message ("Building wheelColliders: name " + o.name + " ID " + wheelNumber.ToString());
 					wheelColliders.Add (wheelNumber, o as WheelCollider);
 				}
 
 				if (o.name.StartsWith (modelConfig.Joint) && o is Transform)
 				{
 					int jointNumber = Convert.ToInt32 (o.name.Substring (modelConfig.Joint.Length));
-					//Debuggar.Message ("Building suspJoints: name " + o.name + " ID " + jointNumber.ToString());
 					suspJoints.Add (jointNumber, o as Transform);
 				}
 			}
@@ -60,8 +59,6 @@ namespace Trackar
 			{
 				int number = i.Key;
 				WheelCollider collider = i.Value;
-
-				//Debuggar.Message ("WheelDummyList spawning new WheelDummy " + number.ToString());
 				WheelDummies.Add (new WheelDummy (collider, suspJoints[number], wheelObjects[number], Config));
 			}
 			Debuggar.Message("WheelDummyList spawned: " + WheelDummies.Count.ToString() + " WheelDummies in this list");
