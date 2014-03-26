@@ -24,13 +24,14 @@ namespace Trackar
 		private Transform _joint;
 		private GameObject _model;
 
-		public WheelDummy(WheelCollider col, Transform joint, GameObject model)
+		public WheelDummy(WheelCollider col, Transform joint, GameObject model, SuspConfig susp)
 		{
 			Debuggar.Message ("New WheelDummy instantiated");
 
 			this._collider = col;
 			this._joint = joint;
 			this._model = model;
+			this.Susp = susp;
 		}
 
 		public void Rotate(float rpm)

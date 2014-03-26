@@ -93,7 +93,7 @@ namespace Trackar
 				collider.brakeTorque = Config.RollingResistance;
 
 				Debuggar.Message ("Instantiating WheelDummy " + number.ToString());
-				WheelDummies.Add (new WheelDummy (collider, suspJoints[number], wheelObjects[number]));
+				WheelDummies.Add (new WheelDummy (collider, suspJoints[number], wheelObjects[number], Config.Suspension));
 			}
 
 			TrackSurfaceTransform = Root.transform.Find (Config.TrackSurfaceName);
@@ -112,7 +112,7 @@ namespace Trackar
 					RealRPM = wheel.Collider.rpm * wheel.Collider.radius;
 					RPM = Mathf.Abs (RealRPM);
 				}
-				wheel.Susp = Susp;
+				//wheel.Susp = Susp;
 				wheel.PhysUpdate ();
 			}
 		}

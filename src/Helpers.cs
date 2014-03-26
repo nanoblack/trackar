@@ -35,9 +35,11 @@ namespace Trackar
 		public string RightTrackRoot;
 
 		public string SingleTrackRoot;
+
+		public SuspConfig Suspension;
 	}
 
-	public struct SuspConfig
+	public class SuspConfig
 	{
 		public float Travel;
 		public float TravelCenter;

@@ -85,6 +85,8 @@ namespace Trackar
 			TrackConfig.RightTrackRoot = "";
 
 			TrackConfig.SingleTrackRoot = "";
+
+			TrackConfig.Suspension = new SuspConfig();
 		}
 
 		public override void OnStart(StartState state)
@@ -142,14 +144,13 @@ namespace Trackar
 
 		public virtual void FixedUpdate ()
 		{
-			SuspConfig susp;
-			susp.Damper = dbgDamping;
-			susp.TravelCenter = dbgTargetPosition;
-			susp.Travel = dbgTravel;
+			TrackConfig.Suspension.Damper = dbgDamping;
+			TrackConfig.Suspension.TravelCenter = dbgTargetPosition;
+			TrackConfig.Suspension.Travel = dbgTravel;
 
 			foreach (Track track in Tracks)
 			{
-				track.Susp = susp;
+				//track.Susp = susp;
 				track.PhysUpdate ();
 			}
 		}
