@@ -46,6 +46,7 @@ namespace Trackar
 			WheelDummies = new WheelDummyList (components, Config.WheelDummyConfig, Config.ModelConfig);
 
 			// this can probably be slimmed down a bit, a full blown foreach isn't needed here anymore
+			// i mean come on, we're looking for ONE COMPONENT but looking through ALL OF THEM
 			foreach (Component o in components)
 			{
 				if (o.name.StartsWith (Config.ModelConfig.TrackSurface))
@@ -67,6 +68,7 @@ namespace Trackar
 			WheelDummies.Update ();
 			RPM = WheelDummies.RPM;
 
+			// this needs to be done much different
 			float distanceTravelled = (float)((WheelDummies.RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
 			Material trackMaterial = TrackSurface.renderer.material;
 			Vector2 textureOffset = trackMaterial.mainTextureOffset;
@@ -80,6 +82,7 @@ namespace Trackar
 			WheelDummies.FixedUpdate ();
 		}
 
+		// I think this can be done a bit better
 		public void Brakes(bool active)
 		{
 			if (active)
@@ -88,6 +91,7 @@ namespace Trackar
 				WheelDummies.BrakingTorque = Config.WheelDummyConfig.RollingResistance;
 		}
 
+		// as can this
 		public void ApplyTorque(float torque)
 		{
 			WheelDummies.Torque = torque;

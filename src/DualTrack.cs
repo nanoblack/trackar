@@ -50,7 +50,7 @@ namespace Trackar
 			if (HighLogic.LoadedSceneIsFlight)
 			{
 				LeftTrack = new Track (part.FindModelTransform (LeftTrackRoot), TrackConfig, true);
-				Tracks.Add (LeftTrack);
+				Tracks.Add (LeftTrack); // can this List be done away with yet? ugh
 
 				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, false);
 				Tracks.Add (RightTrack);
@@ -71,6 +71,7 @@ namespace Trackar
 				LeftTrackRPM = LeftTrack.RPM;
 				RightTrackRPM = RightTrack.RPM;
 
+				// need to do something with this, that drift is annoying
 				RevmatchError = LeftTrackRPM - RightTrackRPM;
 
 				LeftTorque = 0;

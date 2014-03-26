@@ -14,6 +14,7 @@ namespace Trackar
 {
 	public class WheelDummy
 	{
+		// I can't even remember why I made these read only properties but it looks a bit silly to me now
 		public WheelCollider Collider { get { return _collider; } }
 		public Transform Joint { get { return _joint; } }
 		public GameObject WheelModel { get { return _model; } }
@@ -26,6 +27,28 @@ namespace Trackar
 
 		public WheelDummy(WheelCollider col, Transform joint, GameObject model, WheelDummyConfigContainer config)
 		{
+			// if any of these are tripped, the WheelDummy will be basically useless, but that's better than it being definitely useless with NullReferences Everywhere
+			if (col == null)
+			{
+				Debuggar.Error ("Attempted to spawn a WheelDummy with a null WheelCollider");
+				col = new WheelCollider ();
+			}
+			if(joint == null)
+			{
+				Debuggar.Error ("Attempted to spawn a WheelDummy with a null Joint");
+				joint = new GameObject ().transform; // lol gg unity
+			}
+			if(model == null)
+			{
+				Debuggar.Error ("Attempted to spawn a WheelDummy with a null Model");
+				model = new GameObject ();
+			}
+			if(config == null)
+			{
+				Debuggar.Error ("Attempted to spawn a WheelDummy with a null WheelDummyConfigContainer");
+				config = new WheelDummyConfigContainer ();
+			}
+
 			this._collider = col;
 			this._joint = joint;
 			this._model = model;
@@ -45,6 +68,7 @@ namespace Trackar
 			WheelModel.transform.Rotate(Vector3.right, rot);
 		}
 
+		// WHEN AM I GOING TO EVER HAVE SOME SORT OF FUNCTIONAL SUSPENSION UP IN HURR
 		/*public void PhysUpdate()
 		{
 			Collider.suspensionDistance = Susp.Travel;
