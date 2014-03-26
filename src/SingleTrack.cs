@@ -1,7 +1,7 @@
 //=============================================================
-// Nope can't be me, get your freak on, you can suck it
-// They've all seen it and you liked it, now he wants it 
-// Cotton candy suga high
+// Break your bones when you come down
+// You're a one trick mind trick pony
+// Who's next to hop on the ride ride ride... 
 //=============================================================
 
 using System;
@@ -40,19 +40,19 @@ namespace Trackar
 					}
 					else
 					{
-						Debuggar.Message ("Instance " + Convert.ToString(counterpart.GetInstanceID()) + " has already been set as a mirror");
+						Debuggar.Message ("Instance " + Convert.ToString(counterpart.GetInstanceID()) + " is already claimed as this module's mirror instance");
 					}
 				}
 				else
-					Debuggar.Message ("Symmetry conterpart with no corresponding module!");
+					Debuggar.Error ("Symmetry conterpart with no corresponding module");
 			}
 
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				TrackConfig.SingleTrackRoot = SingleTrackRoot;
-				Debuggar.Message ("Instantiating new Track: " + SingleTrackRoot);
+				//Debuggar.Message ("Instantiating new Track: " + SingleTrackRoot);
 				Tracks.Add (new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bIsMirrorInstance));
 			}
+			Debuggar.Message ("SingleTrack module successfully started");
 		}
 
 		public override void FixedUpdate ()

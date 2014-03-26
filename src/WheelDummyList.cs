@@ -1,7 +1,7 @@
 //=============================================================
 // We mash up the place, turn up the bass
-// And mek dem all have fun
-// A-we ablaze the fire, make it bun dem
+// And mek sum soundboy run
+// And we will end your week just like a Sunday
 //=============================================================
 
 using System;
@@ -16,7 +16,7 @@ namespace Trackar
 	public class WheelDummyList
 	{
 		public List<WheelDummy> WheelDummies = new List<WheelDummy>();
-		public ConfigContainer Config;
+		public WheelDummyConfigContainer Config;
 
 		public float Torque = 0;
 		public float BrakingTorque = 0;
@@ -24,7 +24,7 @@ namespace Trackar
 		public float RPM = 0;
 		public float RealRPM;
 
-		public WheelDummyList (Component[] components, ConfigContainer config)
+		public WheelDummyList (Component[] components, WheelDummyConfigContainer config, ModelConfigContainer modelConfig)
 		{
 			// TODO: Dictionaries are a smidge excessive, no?
 			Dictionary<int,GameObject> wheelObjects = new Dictionary<int, GameObject>();
@@ -35,24 +35,24 @@ namespace Trackar
 
 			foreach(Component o in components)
 			{
-				if (o.name.StartsWith (Config.WheelModelName) && o is MeshFilter)
+				if (o.name.StartsWith (modelConfig.WheelModel) && o is MeshFilter)
 				{
-					int wheelNumber = Convert.ToInt32 (o.name.Substring (Config.WheelModelName.Length));
-					Debuggar.Message ("Building wheelObjects: name " + o.name + " ID " + wheelNumber.ToString());
+					int wheelNumber = Convert.ToInt32 (o.name.Substring (modelConfig.WheelModel.Length));
+					//Debuggar.Message ("Building wheelObjects: name " + o.name + " ID " + wheelNumber.ToString());
 					wheelObjects.Add (wheelNumber, o.gameObject);
 				}
 
-				if (o.name.StartsWith (Config.WheelColliderName) && o is WheelCollider)
+				if (o.name.StartsWith (modelConfig.WheelCollider) && o is WheelCollider)
 				{
-					int wheelNumber = Convert.ToInt32 (o.name.Substring (Config.WheelColliderName.Length));
-					Debuggar.Message ("Building wheelColliders: name " + o.name + " ID " + wheelNumber.ToString());
+					int wheelNumber = Convert.ToInt32 (o.name.Substring (modelConfig.WheelCollider.Length));
+					//Debuggar.Message ("Building wheelColliders: name " + o.name + " ID " + wheelNumber.ToString());
 					wheelColliders.Add (wheelNumber, o as WheelCollider);
 				}
 
-				if (o.name.StartsWith (Config.SuspJointName) && o is Transform)
+				if (o.name.StartsWith (modelConfig.Joint) && o is Transform)
 				{
-					int jointNumber = Convert.ToInt32 (o.name.Substring (Config.SuspJointName.Length));
-					Debuggar.Message ("Building suspJoints: name " + o.name + " ID " + jointNumber.ToString());
+					int jointNumber = Convert.ToInt32 (o.name.Substring (modelConfig.Joint.Length));
+					//Debuggar.Message ("Building suspJoints: name " + o.name + " ID " + jointNumber.ToString());
 					suspJoints.Add (jointNumber, o as Transform);
 				}
 			}
@@ -61,13 +61,10 @@ namespace Trackar
 				int number = i.Key;
 				WheelCollider collider = i.Value;
 
-				collider.enabled = true;
-
-				collider.brakeTorque = Config.RollingResistance;
-
-				Debuggar.Message ("Instantiating WheelDummy " + number.ToString());
-				WheelDummies.Add (new WheelDummy (collider, suspJoints[number], wheelObjects[number], Config.Suspension));
+				//Debuggar.Message ("WheelDummyList spawning new WheelDummy " + number.ToString());
+				WheelDummies.Add (new WheelDummy (collider, suspJoints[number], wheelObjects[number], Config));
 			}
+			Debuggar.Message("WheelDummyList spawned: " + WheelDummies.Count.ToString() + " WheelDummies in this list");
 		}
 
 		public bool IsOnGround()
@@ -91,8 +88,6 @@ namespace Trackar
 					RealRPM = wheelDummy.Collider.rpm * wheelDummy.Collider.radius;
 					RPM = Mathf.Abs (RealRPM);
 				}
-				wheelDummy.Collider.motorTorque = Torque;
-				wheelDummy.Collider.brakeTorque = BrakingTorque;
 				wheelDummy.Rotate (RealRPM);
 			}
 		}

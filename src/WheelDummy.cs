@@ -1,7 +1,7 @@
 //=============================================================
-// Back to bring-a-booksville
-// We've all been there, what's the next stop?
-// I won't sit still 
+// We mash up the place, turn up the bass
+// And mek dem all have fun
+// A-we ablaze the fire, make it bun dem
 //=============================================================
 
 using System;
@@ -18,20 +18,23 @@ namespace Trackar
 		public Transform Joint { get { return _joint; } }
 		public GameObject WheelModel { get { return _model; } }
 
-		public SuspConfig Susp;
+		public SuspConfigContainer Susp;
 
 		private WheelCollider _collider;
 		private Transform _joint;
 		private GameObject _model;
 
-		public WheelDummy(WheelCollider col, Transform joint, GameObject model, SuspConfig susp)
+		public WheelDummy(WheelCollider col, Transform joint, GameObject model, WheelDummyConfigContainer config)
 		{
-			Debuggar.Message ("New WheelDummy instantiated");
-
 			this._collider = col;
 			this._joint = joint;
 			this._model = model;
-			this.Susp = susp;
+			this.Susp = config.SuspConfig;
+
+			Collider.brakeTorque = config.RollingResistance;
+			Collider.enabled = true;
+
+			Debuggar.Message ("WheelDummy spawned");
 		}
 
 		public void Rotate(float rpm)

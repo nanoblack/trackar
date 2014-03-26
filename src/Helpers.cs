@@ -1,7 +1,7 @@
 //=============================================================
-// Straw dumb blonde, brown licorice candy girl I is
-// Dot connector, paint a picture
-// I'm not in it, never will be 
+// Nope can't be me, get your freak on, you can suck it
+// They've all seen it and you liked it, now he wants it 
+// Cotton candy suga high
 //=============================================================
 
 using System;
@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Trackar
 {
-	public struct ConfigContainer
+	/*public struct ConfigContainer
 	{
 		public float TrackWidth;
 		public float TrackSections;
@@ -31,20 +31,13 @@ namespace Trackar
 
 		public bool bIsDoubleTrackPart;
 
-		public string LeftTrackRoot;
-		public string RightTrackRoot;
+		//public string LeftTrackRoot;
+		//public string RightTrackRoot;
 
-		public string SingleTrackRoot;
+		//public string SingleTrackRoot;
 
 		public SuspConfig Suspension;
-	}
-
-	public class SuspConfig
-	{
-		public float Travel;
-		public float TravelCenter;
-		public float Damper;
-	}
+	}*/
 
 	public struct ProcVars
 	{
@@ -59,6 +52,12 @@ namespace Trackar
 		{
 			if (bIsDebugMode)
 				Debug.Log("Trackar: " + message);
+		}
+
+		public static void Error(string message)
+		{
+			if (bIsDebugMode)
+				Debug.Log ("Trackar GURU MEDITATION: " + message);
 		}
 	}
 }

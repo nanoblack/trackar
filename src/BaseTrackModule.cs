@@ -63,11 +63,13 @@ namespace Trackar
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgDamping"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
 		public float dbgDamping = 0;
 
-		public ConfigContainer TrackConfig;
+		//public ConfigContainer TrackConfig;
+
+		public TrackConfigContainer TrackConfig;
 
 		public void InitBaseTrackModule()
 		{
-			TrackConfig.TrackSections = TrackSections;
+			/*TrackConfig.TrackSections = TrackSections;
 			TrackConfig.TrackWidth = TrackWidth;
 			TrackConfig.TrackThickness = TrackThickness;
 			TrackConfig.BrakingTorque = BrakingTorque;
@@ -81,12 +83,12 @@ namespace Trackar
 
 			TrackConfig.bIsDoubleTrackPart = true;
 
-			TrackConfig.LeftTrackRoot = "";
-			TrackConfig.RightTrackRoot = "";
+			TrackConfig.Suspension = new SuspConfig();*/
+			SuspConfigContainer SuspConfig = new SuspConfigContainer (dbgTravel, dbgTargetPosition, dbgDamping);
+			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
+			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
 
-			TrackConfig.SingleTrackRoot = "";
-
-			TrackConfig.Suspension = new SuspConfig();
+			TrackConfig = new TrackConfigContainer (TrackWidth, TrackLength, ModelConfig, WheelDummyConfig);
 		}
 
 		public override void OnStart(StartState state)
@@ -103,6 +105,7 @@ namespace Trackar
 					CruiseActionGroup = action.actionGroup;
 			}
 			InitBaseTrackModule ();
+			Debuggar.Message ("BaseTrackModule module successfully started");
 		}
 
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
@@ -144,9 +147,15 @@ namespace Trackar
 
 		public virtual void FixedUpdate ()
 		{
-			TrackConfig.Suspension.Damper = dbgDamping;
+
+			/*TrackConfig.Suspension.Damper = dbgDamping;
 			TrackConfig.Suspension.TravelCenter = dbgTargetPosition;
-			TrackConfig.Suspension.Travel = dbgTravel;
+			TrackConfig.Suspension.Travel = dbgTravel;*/
+
+			SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
+			suspConfig.Damper = dbgDamping;
+			suspConfig.Travel = dbgTravel;
+			suspConfig.TravelCenter = dbgTargetPosition;
 
 			foreach (Track track in Tracks)
 			{

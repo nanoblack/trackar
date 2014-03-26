@@ -1,7 +1,7 @@
 //=============================================================
-// Break your bones when you come down
-// You're a one trick mind trick pony
-// Who's next to hop on the ride ride ride... 
+// Back to bring-a-booksville
+// We've all been there, what's the next stop?
+// I won't sit still 
 //=============================================================
 
 using System;
@@ -29,40 +29,39 @@ namespace Trackar
 
 		public WheelDummyList WheelDummies;
 
-		public ConfigContainer Config;
+		public TrackConfigContainer Config;
 
-		public SuspConfig Susp;
+		//public SuspConfig Susp;
 
-		public Track(Transform transform, ConfigContainer configContainer, bool mirror)
+		public Track(Transform transform, TrackConfigContainer configContainer, bool mirror)
 		{
-			Debuggar.Message ("New Track instantiated");
-
 			Config = configContainer;
 
 			TrackTransform = transform;
 
 			Root = TrackTransform.gameObject;
 
-			WidthScale = Config.TrackWidth;
+			WidthScale = Config.Width;
 
 			Component[] components = Root.GetComponentsInChildren<Component> ();
-			Debuggar.Message ("Fetching Components: " + components.Count ().ToString ());
+			//Debuggar.Message ("Fetching Components: " + components.Count ().ToString ());
 
-			WheelDummies = new WheelDummyList (components, Config);
+			WheelDummies = new WheelDummyList (components, Config.WheelDummyConfig, Config.ModelConfig);
 
 			foreach (Component o in components)
 			{
-				if (o.name.StartsWith (Config.TrackSurfaceName))
+				if (o.name.StartsWith (Config.ModelConfig.TrackSurface))
 				{
 					TrackSurface = o as SkinnedMeshRenderer;
-					Debuggar.Message ("Found track surface: " + o.name);
+					//Debuggar.Message ("Found track surface: " + o.name);
 				}
 			}
-			TrackSurfaceTransform = Root.transform.Find (Config.TrackSurfaceName);
+			TrackSurfaceTransform = Root.transform.Find (Config.ModelConfig.TrackSurface);
 			if (TrackSurfaceTransform == null)
-				Debuggar.Message ("TrackSurfaceTransform is null!");
+				Debuggar.Error ("TrackSurfaceTransform is null");
 
 			bIsMirror = mirror;
+			Debuggar.Message ("Track spawned");
 		}
 
 		public void Update()
@@ -73,7 +72,7 @@ namespace Trackar
 			float distanceTravelled = (float)((WheelDummies.RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
 			Material trackMaterial = TrackSurface.renderer.material;
 			Vector2 textureOffset = trackMaterial.mainTextureOffset;
-			textureOffset = textureOffset + new Vector2(-distanceTravelled / Config.TrackLength, 0);
+			textureOffset = textureOffset + new Vector2(-distanceTravelled / Config.Length, 0);
 			trackMaterial.SetTextureOffset("_MainTex", textureOffset);
 			trackMaterial.SetTextureOffset("_BumpMap", textureOffset);
 		}
@@ -86,9 +85,9 @@ namespace Trackar
 		public void Brakes(bool active)
 		{
 			if (active)
-				WheelDummies.BrakingTorque = Config.BrakingTorque;
+				WheelDummies.BrakingTorque = Config.WheelDummyConfig.BrakingTorque;
 			else
-				WheelDummies.BrakingTorque = Config.RollingResistance;
+				WheelDummies.BrakingTorque = Config.WheelDummyConfig.RollingResistance;
 		}
 
 		public void ApplyTorque(float torque)
