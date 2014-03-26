@@ -1,3 +1,9 @@
+//=============================================================
+// Back to bring-a-booksville
+// We've all been there, what's the next stop?
+// I won't sit still 
+//=============================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +19,6 @@ namespace Trackar
 		public float WidthScale = 1;
 
 		public float RPM = 0.0f;
-		public float RealRPM = 0.0f;
 
 		public bool bIsMirror = false;
 
@@ -22,125 +27,72 @@ namespace Trackar
 		public Transform TrackTransform;
 		public Transform TrackSurfaceTransform;
 
-		public List<WheelDummy> WheelDummies = new List<WheelDummy>();
+		public WheelDummyList WheelDummies;
 
-		public ConfigContainer Config;
+		public TrackConfigContainer Config;
 
-		public Track(Transform transform, ConfigContainer configContainer, bool mirror)
+		//public SuspConfig Susp;
+
+		public Track(Transform transform, TrackConfigContainer configContainer, bool mirror)
 		{
-			Debuggar.Message ("New Track instantiated");
-
 			Config = configContainer;
 
 			TrackTransform = transform;
 
 			Root = TrackTransform.gameObject;
 
-			WidthScale = Config.TrackWidth;
+			WidthScale = Config.Width;
 
-			Component[] components = Root.GetComponentsInChildren<Component>();
-			Debuggar.Message ("Fetching Components: " + components.Count().ToString());
+			Component[] components = Root.GetComponentsInChildren<Component> ();
+			//Debuggar.Message ("Fetching Components: " + components.Count ().ToString ());
 
-			Dictionary<int,GameObject> wheelObjects = new Dictionary<int, GameObject>();
-			Dictionary<int,WheelCollider> wheelColliders = new Dictionary<int, WheelCollider>();
-			Dictionary<int,Transform> suspJoints = new Dictionary<int, Transform>();
+			WheelDummies = new WheelDummyList (components, Config.WheelDummyConfig, Config.ModelConfig);
 
-			foreach(Component o in components)
+			foreach (Component o in components)
 			{
-				if (o.name.StartsWith (Config.WheelModelName) && o is MeshFilter)
-				{
-					int wheelNumber = Convert.ToInt32 (o.name.Substring (Config.WheelModelName.Length));
-					Debuggar.Message ("Building wheelObjects: name " + o.name + " ID " + wheelNumber.ToString());
-					wheelObjects.Add (wheelNumber, o.gameObject);
-				}
-
-				if (o.name.StartsWith (Config.WheelColliderName) && o is WheelCollider)
-				{
-					int wheelNumber = Convert.ToInt32 (o.name.Substring (Config.WheelColliderName.Length));
-					Debuggar.Message ("Building wheelColliders: name " + o.name + " ID " + wheelNumber.ToString());
-					wheelColliders.Add (wheelNumber, o as WheelCollider);
-				}
-
-				if (o.name.StartsWith (Config.SuspJointName) && o is Transform)
-				{
-					int jointNumber = Convert.ToInt32 (o.name.Substring (Config.SuspJointName.Length));
-					Debuggar.Message ("Building suspJoints: name " + o.name + " ID " + jointNumber.ToString());
-					suspJoints.Add (jointNumber, o as Transform);
-				}
-
-				if (o.name.StartsWith (Config.TrackSurfaceName))
+				if (o.name.StartsWith (Config.ModelConfig.TrackSurface))
 				{
 					TrackSurface = o as SkinnedMeshRenderer;
-					Debuggar.Message ("Found track surface: " + o.name);
+					//Debuggar.Message ("Found track surface: " + o.name);
 				}
 			}
-
-			foreach(KeyValuePair<int, WheelCollider> i in wheelColliders)
-			{
-				int number = i.Key;
-				WheelCollider collider = i.Value;
-
-				collider.enabled = true;
-
-				collider.brakeTorque = Config.RollingResistance;
-
-				Debuggar.Message ("Instantiating WheelDummy " + number.ToString());
-				WheelDummies.Add (new WheelDummy (collider, suspJoints[number], wheelObjects[number]));
-			}
-
-			TrackSurfaceTransform = Root.transform.Find (Config.TrackSurfaceName);
+			TrackSurfaceTransform = Root.transform.Find (Config.ModelConfig.TrackSurface);
 			if (TrackSurfaceTransform == null)
-				Debuggar.Message ("TrackSurfaceTransform is null!");
+				Debuggar.Error ("TrackSurfaceTransform is null");
 
 			bIsMirror = mirror;
+			Debuggar.Message ("Track spawned");
 		}
 
-		public void DoMovementAnims()
+		public void Update()
 		{
-			float distanceTravelled = (float)((RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
+			WheelDummies.Update ();
+			RPM = WheelDummies.RPM;
+
+			float distanceTravelled = (float)((WheelDummies.RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
 			Material trackMaterial = TrackSurface.renderer.material;
 			Vector2 textureOffset = trackMaterial.mainTextureOffset;
-			textureOffset = textureOffset + new Vector2(-distanceTravelled / Config.TrackLength, 0);
+			textureOffset = textureOffset + new Vector2(-distanceTravelled / Config.Length, 0);
 			trackMaterial.SetTextureOffset("_MainTex", textureOffset);
 			trackMaterial.SetTextureOffset("_BumpMap", textureOffset);
-
-			foreach(WheelDummy wheel in WheelDummies)
-			{
-				if (Config.bIsDoubleTrackPart)
-				{
-					if (bIsMirror)
-						wheel.Rotate (RealRPM);
-					else
-						wheel.Rotate (-RealRPM);
-				}
-				else
-					wheel.Rotate (RealRPM);
-			}
 		}
 
-		public void EngageBrake()
+		public void FixedUpdate ()
 		{
-			foreach (WheelDummy wheel in WheelDummies)
-				wheel.Collider.brakeTorque = Config.BrakingTorque;
+			WheelDummies.FixedUpdate ();
 		}
 
-		public void ReleaseBrake()
+		public void Brakes(bool active)
 		{
-			foreach (WheelDummy wheel in WheelDummies)
-				wheel.Collider.brakeTorque = Config.RollingResistance;
+			if (active)
+				WheelDummies.BrakingTorque = Config.WheelDummyConfig.BrakingTorque;
+			else
+				WheelDummies.BrakingTorque = Config.WheelDummyConfig.RollingResistance;
 		}
 
 		public void ApplyTorque(float torque)
 		{
-			foreach (WheelDummy wheelDummy in WheelDummies)
-			{
-				wheelDummy.Collider.motorTorque = torque;
-				if (wheelDummy.Collider.isGrounded)
-				{
-					RealRPM = wheelDummy.Collider.rpm * wheelDummy.Collider.radius;
-					RPM = Mathf.Abs (RealRPM);
-				}
-			}
+			WheelDummies.Torque = torque;
 		}
 	}
 }

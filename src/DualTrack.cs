@@ -1,3 +1,9 @@
+//=============================================================
+// Straw dumb blonde, brown licorice candy girl I is
+// Dot connector, paint a picture
+// I'm not in it, never will be 
+//=============================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,17 +49,15 @@ namespace Trackar
 
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				TrackConfig.LeftTrackRoot = LeftTrackRoot;
-				TrackConfig.RightTrackRoot = RightTrackRoot;
-
-				Debuggar.Message ("Instantiating new Track: " + LeftTrackRoot);
+				//Debuggar.Message ("Instantiating new Track: " + LeftTrackRoot);
 				LeftTrack = new Track (part.FindModelTransform (LeftTrackRoot), TrackConfig, true);
 				Tracks.Add (LeftTrack);
 
-				Debuggar.Message ("Instantiating new Track: " + RightTrackRoot);
+				//Debuggar.Message ("Instantiating new Track: " + RightTrackRoot);
 				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, false);
 				Tracks.Add (RightTrack);
 			}
+			Debuggar.Message ("DualTrack module successfully started");
 		}
 
 		public override void FixedUpdate ()

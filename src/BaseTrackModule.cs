@@ -1,3 +1,9 @@
+//=============================================================
+// Pump the brakes, you're a red flag red light
+// Holdin' up a stop sign, I'll never be sloppy seconds
+// Go ahead and take 'em back, your one, two, three minutes 
+//=============================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,19 +33,21 @@ namespace Trackar
 
 
 		[KSPField]
-		public string WheelModelName = "RoadWheel";
+		public string WheelModelName;
 		[KSPField]
-		public string WheelColliderName = "WheelCollider";
+		public string WheelColliderName;
 		[KSPField]
-		public string TrackSurfaceName = "TrackSurface";
+		public string TrackSurfaceName;
 		[KSPField]
-		public string SuspJointName = "joint";
+		public string SuspJointName;
 
 
 		public bool bAreBrakesEngaged = false;
 
 		public bool bIsMirrorInstance = false;
 
+		// I'd say this list is unnecessary but it does make it simple for this base class to implement common methods that interact with Track instances regardless of count
+		// It is a bit excessive though
 		public List<Track> Tracks = new List<Track>();
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
@@ -48,11 +56,20 @@ namespace Trackar
 		public float CruiseTargetRPM = 0;
 		public KSPActionGroup CruiseActionGroup;
 
-		public ConfigContainer TrackConfig;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTargetPosition"), UI_FloatRange(minValue = -4, maxValue = 0, stepIncrement = 0.25f)]
+		public float dbgTargetPosition = 0;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTravel"), UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
+		public float dbgTravel = 0;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgDamping"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
+		public float dbgDamping = 0;
 
-		public void BuildTrackConfig()
+		//public ConfigContainer TrackConfig;
+
+		public TrackConfigContainer TrackConfig;
+
+		public void InitBaseTrackModule()
 		{
-			TrackConfig.TrackSections = TrackSections;
+			/*TrackConfig.TrackSections = TrackSections;
 			TrackConfig.TrackWidth = TrackWidth;
 			TrackConfig.TrackThickness = TrackThickness;
 			TrackConfig.BrakingTorque = BrakingTorque;
@@ -66,16 +83,12 @@ namespace Trackar
 
 			TrackConfig.bIsDoubleTrackPart = true;
 
-			TrackConfig.LeftTrackRoot = "";
-			TrackConfig.RightTrackRoot = "";
+			TrackConfig.Suspension = new SuspConfig();*/
+			SuspConfigContainer SuspConfig = new SuspConfigContainer (dbgTravel, dbgTargetPosition, dbgDamping);
+			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
+			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
 
-			TrackConfig.SingleTrackRoot = "";
-		}
-
-		public void DispatchAnimsUpdate()
-		{
-			foreach(Track track in Tracks)
-				track.DoMovementAnims ();
+			TrackConfig = new TrackConfigContainer (TrackWidth, TrackLength, ModelConfig, WheelDummyConfig);
 		}
 
 		public override void OnStart(StartState state)
@@ -91,8 +104,8 @@ namespace Trackar
 				if (action.guiName.ToString () == "Toggle Cruise Control")
 					CruiseActionGroup = action.actionGroup;
 			}
-
-			BuildTrackConfig ();
+			InitBaseTrackModule ();
+			Debuggar.Message ("BaseTrackModule module successfully started");
 		}
 
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
@@ -106,12 +119,12 @@ namespace Trackar
 				}
 
 				foreach (Track track in Tracks)
-					track.EngageBrake ();
+					track.Brakes (true);
 			}
 			else
 			{
 				foreach (Track track in Tracks)
-					track.ReleaseBrake ();
+					track.Brakes (false);
 			}
 		}
 
@@ -134,13 +147,31 @@ namespace Trackar
 
 		public virtual void FixedUpdate ()
 		{
-			//DispatchSuspension ();
+
+			/*TrackConfig.Suspension.Damper = dbgDamping;
+			TrackConfig.Suspension.TravelCenter = dbgTargetPosition;
+			TrackConfig.Suspension.Travel = dbgTravel;*/
+
+			SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
+			suspConfig.Damper = dbgDamping;
+			suspConfig.Travel = dbgTravel;
+			suspConfig.TravelCenter = dbgTargetPosition;
+
+			foreach (Track track in Tracks)
+			{
+				//track.Susp = susp;
+				track.FixedUpdate ();
+
+			}
 		}
 
 		public override void OnUpdate ()
 		{
-			if(HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
-				DispatchAnimsUpdate ();
+			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
+			{
+				foreach (Track track in Tracks)
+					track.Update ();
+			}
 
 			if(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor)
 				//DispatchProceduralUpdate ();

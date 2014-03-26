@@ -1,3 +1,9 @@
+//=============================================================
+// Nope can't be me, get your freak on, you can suck it
+// They've all seen it and you liked it, now he wants it 
+// Cotton candy suga high
+//=============================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +14,7 @@ using UnityEngine;
 
 namespace Trackar
 {
-	public struct ConfigContainer
+	/*public struct ConfigContainer
 	{
 		public float TrackWidth;
 		public float TrackSections;
@@ -25,11 +31,13 @@ namespace Trackar
 
 		public bool bIsDoubleTrackPart;
 
-		public string LeftTrackRoot;
-		public string RightTrackRoot;
+		//public string LeftTrackRoot;
+		//public string RightTrackRoot;
 
-		public string SingleTrackRoot;
-	}
+		//public string SingleTrackRoot;
+
+		public SuspConfig Suspension;
+	}*/
 
 	public struct ProcVars
 	{
@@ -38,12 +46,18 @@ namespace Trackar
 
 	public static class Debuggar
 	{
-		public const bool bIsDebugMode = false;
+		public const bool bIsDebugMode = true;
 
 		public static void Message(string message)
 		{
 			if (bIsDebugMode)
 				Debug.Log("Trackar: " + message);
+		}
+
+		public static void Error(string message)
+		{
+			if (bIsDebugMode)
+				Debug.Log ("Trackar GURU MEDITATION: " + message);
 		}
 	}
 }
