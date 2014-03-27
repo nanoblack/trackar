@@ -31,8 +31,6 @@ namespace Trackar
 
 		public TrackConfigContainer Config;
 
-		//public SuspConfig Susp;
-
 		public Track(Transform transform, TrackConfigContainer configContainer, bool mirror)
 		{
 			Config = configContainer;
@@ -44,23 +42,24 @@ namespace Trackar
 			WidthScale = Config.Width;
 
 			Component[] components = Root.GetComponentsInChildren<Component> ();
-			//Debuggar.Message ("Fetching Components: " + components.Count ().ToString ());
 
 			WheelDummies = new WheelDummyList (components, Config.WheelDummyConfig, Config.ModelConfig);
 
+			// this can probably be slimmed down a bit, a full blown foreach isn't needed here anymore
+			// i mean come on, we're looking for ONE COMPONENT but looking through ALL OF THEM
 			foreach (Component o in components)
 			{
 				if (o.name.StartsWith (Config.ModelConfig.TrackSurface))
-				{
 					TrackSurface = o as SkinnedMeshRenderer;
-					//Debuggar.Message ("Found track surface: " + o.name);
-				}
 			}
+
 			TrackSurfaceTransform = Root.transform.Find (Config.ModelConfig.TrackSurface);
+
 			if (TrackSurfaceTransform == null)
 				Debuggar.Error ("TrackSurfaceTransform is null");
 
 			bIsMirror = mirror;
+
 			Debuggar.Message ("Track spawned");
 		}
 
@@ -69,6 +68,7 @@ namespace Trackar
 			WheelDummies.Update ();
 			RPM = WheelDummies.RPM;
 
+			// this needs to be done much different
 			float distanceTravelled = (float)((WheelDummies.RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
 			Material trackMaterial = TrackSurface.renderer.material;
 			Vector2 textureOffset = trackMaterial.mainTextureOffset;
@@ -82,6 +82,7 @@ namespace Trackar
 			WheelDummies.FixedUpdate ();
 		}
 
+		// I think this can be done a bit better
 		public void Brakes(bool active)
 		{
 			if (active)
@@ -90,6 +91,7 @@ namespace Trackar
 				WheelDummies.BrakingTorque = Config.WheelDummyConfig.RollingResistance;
 		}
 
+		// as can this
 		public void ApplyTorque(float torque)
 		{
 			WheelDummies.Torque = torque;

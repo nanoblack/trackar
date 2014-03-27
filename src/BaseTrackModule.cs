@@ -63,27 +63,10 @@ namespace Trackar
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgDamping"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
 		public float dbgDamping = 0;
 
-		//public ConfigContainer TrackConfig;
-
 		public TrackConfigContainer TrackConfig;
 
 		public void InitBaseTrackModule()
 		{
-			/*TrackConfig.TrackSections = TrackSections;
-			TrackConfig.TrackWidth = TrackWidth;
-			TrackConfig.TrackThickness = TrackThickness;
-			TrackConfig.BrakingTorque = BrakingTorque;
-			TrackConfig.RollingResistance = RollingResistance;
-			TrackConfig.TrackLength = TrackLength;
-
-			TrackConfig.WheelModelName = WheelModelName;
-			TrackConfig.WheelColliderName = WheelColliderName;
-			TrackConfig.TrackSurfaceName = TrackSurfaceName;
-			TrackConfig.SuspJointName = SuspJointName;
-
-			TrackConfig.bIsDoubleTrackPart = true;
-
-			TrackConfig.Suspension = new SuspConfig();*/
 			SuspConfigContainer SuspConfig = new SuspConfigContainer (dbgTravel, dbgTargetPosition, dbgDamping);
 			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
 			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
@@ -147,11 +130,6 @@ namespace Trackar
 
 		public virtual void FixedUpdate ()
 		{
-
-			/*TrackConfig.Suspension.Damper = dbgDamping;
-			TrackConfig.Suspension.TravelCenter = dbgTargetPosition;
-			TrackConfig.Suspension.Travel = dbgTravel;*/
-
 			SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
 			suspConfig.Damper = dbgDamping;
 			suspConfig.Travel = dbgTravel;
@@ -161,7 +139,6 @@ namespace Trackar
 			{
 				//track.Susp = susp;
 				track.FixedUpdate ();
-
 			}
 		}
 

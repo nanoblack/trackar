@@ -49,7 +49,6 @@ namespace Trackar
 
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				//Debuggar.Message ("Instantiating new Track: " + SingleTrackRoot);
 				Tracks.Add (new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bIsMirrorInstance));
 			}
 			Debuggar.Message ("SingleTrack module successfully started");
@@ -65,6 +64,7 @@ namespace Trackar
 				{
 					foreach (Track track in Tracks)
 					{
+						// I assume these have to be negated immediately like this because the right side is being claimed as mirror?
 						float steer = -2 * this.vessel.ctrlState.wheelSteer;
 						float forward = -this.vessel.ctrlState.wheelThrottle;
 
