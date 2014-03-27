@@ -142,7 +142,7 @@ namespace Trackar
 			}
 		}
 
-		public override void OnUpdate ()
+		public virtual void Update ()
 		{
 			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
@@ -150,10 +150,10 @@ namespace Trackar
 					track.Update ();
 			}
 
-			if(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor)
+			//if(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor)
 				//DispatchProceduralUpdate ();
 
-			base.OnUpdate ();
+			//base.OnUpdate ();
 		}
 
 		public override void OnLoad (ConfigNode node)
