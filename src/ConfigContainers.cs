@@ -82,10 +82,18 @@ namespace Trackar
 
 		public ModelConfigContainer(string wheelCollider, string wheelModel, string trackSurface, string joint)
 		{
-			WheelCollider = wheelCollider;
-			WheelModel = wheelModel;
-			TrackSurface = trackSurface;
-			Joint = joint;
+			if(wheelCollider != null && wheelCollider != "")
+				WheelCollider = wheelCollider;
+
+			if(wheelModel != null && wheelModel != "")
+				WheelModel = wheelModel;
+
+			if(trackSurface != null && trackSurface != "")
+				TrackSurface = trackSurface;
+
+			if(joint != null && joint != "")
+				Joint = joint;
+
 			Debuggar.Message ("ModelConfigContainer spawned: WheelCollider = " + WheelCollider + " WheelModel = " + WheelModel + " TrackSurface = " + TrackSurface + " Joint = " + Joint);
 		}
 	}

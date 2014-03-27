@@ -22,6 +22,17 @@ namespace Trackar
 			UI_Toggle(disabledText="Disabled", enabledText="Enabled")]
 		public bool bIsTrackEnabled = true;
 
+		[KSPField(guiName = "X position", guiFormat = "F1", guiActiveEditor = Debuggar.bIsDebugMode)]
+		public float dbgPartX = 0;
+		[KSPField(guiName = "Y position", guiFormat = "F1", guiActiveEditor = Debuggar.bIsDebugMode)]
+		public float dbgPartY = 0;
+		[KSPField(guiName = "Z position", guiFormat = "F1", guiActiveEditor = Debuggar.bIsDebugMode)]
+		public float dbgPartZ = 0;
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "bIsTrackLeftSide")]
+		public bool bIsTrackLeftSide = true;
+
+		private Callback EditorAttachEventHandler;
+
 		public override void OnStart(StartState state)
 		{
 			base.OnStart (state);
@@ -35,6 +46,7 @@ namespace Trackar
 				{
 					if(!bIsMirrorInstance)
 					{
+
 						module.bIsMirrorInstance = true;
 						Debuggar.Message ("Setting instance " + Convert.ToString(counterpart.GetInstanceID()) + " as a mirror instance");
 					}
@@ -54,9 +66,31 @@ namespace Trackar
 			Debuggar.Message ("SingleTrack module successfully started");
 		}
 
+		// why this work in editor but OnUpdate does not?
+		public void OnEditorAttachEvent()
+		{
+			dbgPartX = this.part.transform.position.x;
+			dbgPartY = this.part.transform.position.y;
+			dbgPartZ = this.part.transform.position.z;
+
+			if (dbgPartX <= this.part.symmetryCounterparts [0].transform.position.x)
+				bIsTrackLeftSide = true;
+			else
+				bIsTrackLeftSide = false;
+		}
+
+		public override void Update()
+		{
+			if (EditorAttachEventHandler == null)
+				EditorAttachEventHandler = new Callback(OnEditorAttachEvent);
+			if (!this.part.OnEditorAttach.GetInvocationList().Contains(EditorAttachEventHandler))
+				this.part.OnEditorAttach += EditorAttachEventHandler;
+
+			base.Update ();
+		}
+
 		public override void FixedUpdate ()
 		{
-			base.FixedUpdate ();
 
 			if(HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
@@ -66,7 +100,7 @@ namespace Trackar
 					{
 						// I assume these have to be negated immediately like this because the right side is being claimed as mirror?
 						float steer = -2 * this.vessel.ctrlState.wheelSteer;
-						float forward = -this.vessel.ctrlState.wheelThrottle;
+						float forward = this.vessel.ctrlState.wheelThrottle;
 
 						float torque = 0;
 
@@ -76,7 +110,7 @@ namespace Trackar
 							forward = track.RPM / CruiseTargetRPM;
 						}
 
-						if (track.bIsMirror)
+						if (bIsMirrorInstance && !bIsTrackLeftSide)
 						{
 							forward *= -1;
 						}
@@ -86,6 +120,7 @@ namespace Trackar
 					}
 				}
 			}
+			base.FixedUpdate ();
 		}
 	}
 }
