@@ -66,22 +66,25 @@ namespace Trackar
 
 		public void OnEditorAttachEvent()
 		{
-			dbgPartX = this.part.transform.position.x;
-			dbgPartY = this.part.transform.position.y;
-			dbgPartZ = this.part.transform.position.z;
+			if (this.part.symmetryCounterparts.Count == 1)
+			{
+				dbgPartX = this.part.transform.position.x;
+				dbgPartY = this.part.transform.position.y;
+				dbgPartZ = this.part.transform.position.z;
 
-			if (dbgPartX <= this.part.symmetryCounterparts [0].transform.position.x)
-				bIsTrackLeftSide = true;
-			else
-				bIsTrackLeftSide = false;
+				if (dbgPartX <= this.part.symmetryCounterparts [0].transform.position.x)
+					bIsTrackLeftSide = true;
+				else
+					bIsTrackLeftSide = false;
+			}
 		}
 
 		public override void Update()
 		{
-			/*if (EditorAttachEventHandler == null)
+			if (EditorAttachEventHandler == null)
 				EditorAttachEventHandler = new Callback(OnEditorAttachEvent);
 			if (!this.part.OnEditorAttach.GetInvocationList().Contains(EditorAttachEventHandler))
-				this.part.OnEditorAttach += EditorAttachEventHandler;*/
+				this.part.OnEditorAttach += EditorAttachEventHandler;
 
 			base.Update ();
 		}
