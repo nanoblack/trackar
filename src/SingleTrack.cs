@@ -31,6 +31,8 @@ namespace Trackar
 		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "bIsTrackLeftSide")]
 		public bool bIsTrackLeftSide = true;
 
+		public Track TrackInstance;
+
 		private Callback EditorAttachEventHandler;
 
 		public override void OnStart(StartState state)
@@ -61,7 +63,8 @@ namespace Trackar
 
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				Tracks.Add (new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bIsMirrorInstance));
+				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bIsMirrorInstance);
+				Tracks.Add (TrackInstance);
 			}
 			Debuggar.Message ("SingleTrack module successfully started");
 		}
@@ -81,10 +84,10 @@ namespace Trackar
 
 		public override void Update()
 		{
-			if (EditorAttachEventHandler == null)
+			/*if (EditorAttachEventHandler == null)
 				EditorAttachEventHandler = new Callback(OnEditorAttachEvent);
 			if (!this.part.OnEditorAttach.GetInvocationList().Contains(EditorAttachEventHandler))
-				this.part.OnEditorAttach += EditorAttachEventHandler;
+				this.part.OnEditorAttach += EditorAttachEventHandler;*/
 
 			base.Update ();
 		}
@@ -96,7 +99,31 @@ namespace Trackar
 			{
 				if (bIsTrackEnabled)
 				{
-					foreach (Track track in Tracks)
+					if (TrackInstance != null)
+					{
+						// I assume these have to be negated immediately like this because the right side is being claimed as mirror?
+						float steer = -2 * this.vessel.ctrlState.wheelSteer;
+						float forward = this.vessel.ctrlState.wheelThrottle;
+
+						float torque = 0;
+
+
+						if (bIsCruiseEnabled && TrackInstance.RPM < CruiseTargetRPM)
+						{
+							forward = TrackInstance.RPM / CruiseTargetRPM;
+						}
+
+						if (bIsMirrorInstance && !bIsTrackLeftSide)
+						{
+							forward *= -1;
+						}
+
+						torque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (TrackInstance.RPM));
+						TrackInstance.ApplyTorque (torque);
+					}
+					else Debuggar.Error ("TrackInstance is null");
+
+					/*foreach (Track track in Tracks)
 					{
 						// I assume these have to be negated immediately like this because the right side is being claimed as mirror?
 						float steer = -2 * this.vessel.ctrlState.wheelSteer;
@@ -117,7 +144,7 @@ namespace Trackar
 
 						torque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (track.RPM));
 						track.ApplyTorque (torque);
-					}
+					}*/
 				}
 			}
 			base.FixedUpdate ();
