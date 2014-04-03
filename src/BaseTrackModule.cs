@@ -158,7 +158,6 @@ namespace Trackar
 
 		public override void OnLoad (ConfigNode node)
 		{
-			//DispatchProceduralUpdate ();
 			base.OnLoad (node);
 		}
 
