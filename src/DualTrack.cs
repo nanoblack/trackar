@@ -55,7 +55,7 @@ namespace Trackar
 				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, false);
 				Tracks.Add (RightTrack);
 			}
-			Debuggar.Message ("DualTrack module successfully started");
+			Debuggar.Message ("DualTrack in OnStart(): module successfully started");
 		}
 
 		public override void FixedUpdate ()
@@ -102,9 +102,9 @@ namespace Trackar
 				else
 				{
 					if (LeftTrack == null)
-						Debuggar.Error ("LeftTrack is null");
+						Debuggar.Error ("DualTrack in FixedUpdate(): LeftTrack is null");
 					if (RightTrack == null)
-						Debuggar.Error ("RightTrack is null");
+						Debuggar.Error ("DualTrack in FixedUpdate(): RightTrack is null");
 				}
 			}
 		}

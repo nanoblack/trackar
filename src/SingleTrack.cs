@@ -49,11 +49,11 @@ namespace Trackar
 					if(!bIsMirrorInstance)
 					{
 						module.bIsMirrorInstance = true;
-						Debuggar.Message ("Setting instance " + Convert.ToString(counterpart.GetInstanceID()) + " as a mirror instance");
+						Debuggar.Message ("SingleTrack in OnStart(): Setting instance " + Convert.ToString(counterpart.GetInstanceID()) + " as a mirror instance");
 					}
 				}
 				else
-					Debuggar.Error ("Symmetry conterpart with no corresponding module");
+					Debuggar.Error ("SingleTrack in OnStart(): Symmetry conterpart module is null");
 			}
 
 			if (HighLogic.LoadedSceneIsFlight)
@@ -61,7 +61,7 @@ namespace Trackar
 				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bIsMirrorInstance);
 				Tracks.Add (TrackInstance);
 			}
-			Debuggar.Message ("SingleTrack module successfully started");
+			Debuggar.Message ("SingleTrack in OnStart(): Module successfully started");
 		}
 
 		public void OnEditorAttachEvent()
@@ -115,7 +115,7 @@ namespace Trackar
 						torque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (TrackInstance.RPM));
 						TrackInstance.ApplyTorque (torque);
 					}
-					else Debuggar.Error ("TrackInstance is null");
+					else Debuggar.Error ("SingleTrack in FixedUpdate(): TrackInstance is null");
 
 					/*foreach (Track track in Tracks)
 					{

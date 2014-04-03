@@ -17,7 +17,7 @@ namespace Trackar
 
 		public SuspConfigContainer()
 		{
-			Debuggar.Message ("SuspConfigContainer spawned: empty");
+			Debuggar.Message ("SuspConfigContainer: Spawned empty");
 		}
 
 		public SuspConfigContainer(float travel, float travelCenter, float damper)
@@ -26,7 +26,7 @@ namespace Trackar
 			TravelCenter = travelCenter;
 			Damper = damper;
 
-			Debuggar.Message ("SuspConfigContainer spawned: Travel = " + Travel.ToString () + " TravelCenter = " + TravelCenter.ToString () + " Damper = " + Damper.ToString ());
+			Debuggar.Message ("SuspConfigContainer: Spawned with Travel = " + Travel.ToString () + " TravelCenter = " + TravelCenter.ToString () + " Damper = " + Damper.ToString ());
 		}
 	}
 
@@ -40,7 +40,7 @@ namespace Trackar
 		public WheelDummyConfigContainer()
 		{
 			SuspConfig = new SuspConfigContainer ();
-			Debuggar.Message ("WheelDummyConfigContainer spawned: empty");
+			Debuggar.Message ("WheelDummyConfigContainer: Spawned empty");
 		}
 
 		public WheelDummyConfigContainer(float brakingTorque, float rollingResistance)
@@ -49,7 +49,7 @@ namespace Trackar
 			RollingResistance = rollingResistance;
 
 			SuspConfig = new SuspConfigContainer ();
-			Debuggar.Message ("WheelDummyConfigContainer spawned: BrakingTorque = " + BrakingTorque.ToString () + " RollingResistance = " + RollingResistance.ToString ());
+			Debuggar.Message ("WheelDummyConfigContainer: Spawned with BrakingTorque = " + BrakingTorque.ToString () + " RollingResistance = " + RollingResistance.ToString ());
 		}
 
 		public WheelDummyConfigContainer(float brakingTorque, float rollingResistance, SuspConfigContainer suspConfig)
@@ -62,7 +62,7 @@ namespace Trackar
 			else
 				SuspConfig = new SuspConfigContainer ();
 
-			Debuggar.Message ("WheelDummyConfigContainer spawned: BrakingTorque = " + BrakingTorque.ToString () + " RollingResistance = " + RollingResistance.ToString ());
+			Debuggar.Message ("WheelDummyConfigContainer: Spawned with BrakingTorque = " + BrakingTorque.ToString () + " RollingResistance = " + RollingResistance.ToString ());
 		}
 	}
 
@@ -75,7 +75,7 @@ namespace Trackar
 
 		public ModelConfigContainer()
 		{
-			Debuggar.Message ("ModelConfigContainer spawned: defaults");
+			Debuggar.Message ("ModelConfigContainer: Spawned with defaults");
 		}
 
 		public ModelConfigContainer(string wheelCollider, string wheelModel, string trackSurface, string joint)
@@ -92,7 +92,7 @@ namespace Trackar
 			if(joint != null && joint != "")
 				Joint = joint;
 
-			Debuggar.Message ("ModelConfigContainer spawned: WheelCollider = " + WheelCollider + " WheelModel = " + WheelModel + " TrackSurface = " + TrackSurface + " Joint = " + Joint);
+			Debuggar.Message ("ModelConfigContainer: Spawned with WheelCollider = " + WheelCollider + " WheelModel = " + WheelModel + " TrackSurface = " + TrackSurface + " Joint = " + Joint);
 		}
 	}
 
@@ -109,7 +109,7 @@ namespace Trackar
 		{
 			ModelConfig = new ModelConfigContainer ();
 			WheelDummyConfig = new WheelDummyConfigContainer ();
-			Debuggar.Message ("TrackConfigContainer spawned: empty");
+			Debuggar.Message ("TrackConfigContainer: Spawned empty");
 		}
 
 		public TrackConfigContainer(float width, float length)
@@ -119,7 +119,7 @@ namespace Trackar
 
 			ModelConfig = new ModelConfigContainer ();
 			WheelDummyConfig = new WheelDummyConfigContainer ();
-			Debuggar.Message ("TrackConfigContainer spawned: Width = " + Width.ToString () + " Length = " + Length.ToString ());
+			Debuggar.Message ("TrackConfigContainer: Spawned with Width = " + Width.ToString () + " Length = " + Length.ToString ());
 		}
 
 		public TrackConfigContainer(float width, float length, ModelConfigContainer modelConfig, WheelDummyConfigContainer wheelDummyConfig)
@@ -137,7 +137,7 @@ namespace Trackar
 			else
 				WheelDummyConfig = new WheelDummyConfigContainer ();
 
-			Debuggar.Message ("TrackConfigContainer spawned: Width = " + Width.ToString () + " Length = " + Length.ToString ());
+			Debuggar.Message ("TrackConfigContainer: Spawned with Width = " + Width.ToString () + " Length = " + Length.ToString ());
 		}
 	}
 }

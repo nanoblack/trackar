@@ -63,9 +63,9 @@ namespace Trackar
 					WheelCollider collider = i.Value;
 					WheelDummies.Add (new WheelDummy (collider, suspJoints [number], wheelObjects [number], Config));
 				}
-				Debuggar.Message ("WheelDummyList spawned: " + WheelDummies.Count.ToString () + " WheelDummies in this list");
+				Debuggar.Message ("WheelDummyList: Spawned with " + WheelDummies.Count.ToString () + " WheelDummies");
 			}
-			else Debuggar.Error ("WheelDummyList received null as components");
+			else Debuggar.Error ("WheelDummyList: Received null components");
 		}
 
 		public bool IsOnGround()
@@ -81,7 +81,7 @@ namespace Trackar
 			}
 			else
 			{
-				Debuggar.Error ("WheelDummies list is empty");
+				Debuggar.Error ("WheelDummyList in IsOnGround(): WheelDummies list is empty");
 				return false;
 			}
 		}
@@ -102,7 +102,7 @@ namespace Trackar
 					wheelDummy.Rotate (RealRPM);
 				}
 			}
-			else Debuggar.Error ("WheelDummies list is empty");
+			else Debuggar.Error ("WheelDummyList in Update(): WheelDummies list is empty");
 		}
 		public void FixedUpdate()
 		{
@@ -115,7 +115,7 @@ namespace Trackar
 					wheelDummy.Collider.brakeTorque = BrakingTorque;
 				}
 			}
-			else Debuggar.Error ("WheelDummies list is empty");
+			else Debuggar.Error ("WheelDummyList in FixedUpdate(): WheelDummies list is empty");
 		}
 	}
 }

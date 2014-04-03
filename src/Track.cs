@@ -56,45 +56,60 @@ namespace Trackar
 			TrackSurfaceTransform = Root.transform.Find (Config.ModelConfig.TrackSurface);
 
 			if (TrackSurfaceTransform == null)
-				Debuggar.Error ("TrackSurfaceTransform is null");
+				Debuggar.Error ("Track: TrackSurfaceTransform is null");
 
 			bIsMirror = mirror;
 
-			Debuggar.Message ("Track spawned");
+			Debuggar.Message ("Track: Spawned");
 		}
 
 		public void Update()
 		{
-			WheelDummies.Update ();
-			RPM = WheelDummies.RPM;
+			if (WheelDummies != null)
+			{
+				WheelDummies.Update ();
+				RPM = WheelDummies.RPM;
 
-			// this needs to be done much different
-			float distanceTravelled = (float)((WheelDummies.RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
-			Material trackMaterial = TrackSurface.renderer.material;
-			Vector2 textureOffset = trackMaterial.mainTextureOffset;
-			textureOffset = textureOffset + new Vector2(-distanceTravelled / Config.Length, 0);
-			trackMaterial.SetTextureOffset("_MainTex", textureOffset);
-			trackMaterial.SetTextureOffset("_BumpMap", textureOffset);
+				// this needs to be done much different
+				float distanceTravelled = (float)((WheelDummies.RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
+				Material trackMaterial = TrackSurface.renderer.material;
+				Vector2 textureOffset = trackMaterial.mainTextureOffset;
+				textureOffset = textureOffset + new Vector2 (-distanceTravelled / Config.Length, 0);
+				trackMaterial.SetTextureOffset ("_MainTex", textureOffset);
+				trackMaterial.SetTextureOffset ("_BumpMap", textureOffset);
+			}
+			else Debuggar.Error ("Track in Update(): WheelDummies is null");
 		}
 
 		public void FixedUpdate ()
 		{
-			WheelDummies.FixedUpdate ();
+			if (WheelDummies != null)
+			{
+				WheelDummies.FixedUpdate ();
+			}
+			else Debuggar.Error ("Track in FixedUpdate(): WheelDummies is null");
 		}
 
 		// I think this can be done a bit better
 		public void Brakes(bool active)
 		{
-			if (active)
-				WheelDummies.BrakingTorque = Config.WheelDummyConfig.BrakingTorque;
-			else
-				WheelDummies.BrakingTorque = Config.WheelDummyConfig.RollingResistance;
+			if (WheelDummies != null)
+			{
+				if (active)
+					WheelDummies.BrakingTorque = Config.WheelDummyConfig.BrakingTorque;
+				else
+					WheelDummies.BrakingTorque = Config.WheelDummyConfig.RollingResistance;
+			}
+			else Debuggar.Error ("Track in Brakes(): WheelDummies is null");
 		}
 
 		// as can this
 		public void ApplyTorque(float torque)
 		{
-			WheelDummies.Torque = torque;
+			if (WheelDummies != null)
+				WheelDummies.Torque = torque;
+			else
+				Debuggar.Error ("Track in ApplyTorque(): WheelDummies is null");
 		}
 	}
 }
