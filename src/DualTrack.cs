@@ -63,38 +63,48 @@ namespace Trackar
 
 			base.FixedUpdate ();
 
-			if(HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
+			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
-				float steer = 2 * this.vessel.ctrlState.wheelSteer;
-				float forward = this.vessel.ctrlState.wheelThrottle;
-
-				LeftTrackRPM = LeftTrack.RPM;
-				RightTrackRPM = RightTrack.RPM;
-
-				// need to do something with this, that drift is annoying
-				RevmatchError = LeftTrackRPM - RightTrackRPM;
-
-				LeftTorque = 0;
-				RightTorque = 0;
-
-				if (bIsLeftTrackEnabled)
+				if (LeftTrack != null && RightTrack != null)
 				{
-					if (bIsCruiseEnabled && LeftTrack.RPM < CruiseTargetRPM)
+					float steer = 2 * this.vessel.ctrlState.wheelSteer;
+					float forward = this.vessel.ctrlState.wheelThrottle;
+
+					LeftTrackRPM = LeftTrack.RPM;
+					RightTrackRPM = RightTrack.RPM;
+
+					// need to do something with this, that drift is annoying
+					RevmatchError = LeftTrackRPM - RightTrackRPM;
+
+					LeftTorque = 0;
+					RightTorque = 0;
+
+					if (bIsLeftTrackEnabled)
 					{
-						forward = LeftTrack.RPM / CruiseTargetRPM;
+						if (bIsCruiseEnabled && LeftTrack.RPM < CruiseTargetRPM)
+						{
+							forward = LeftTrack.RPM / CruiseTargetRPM;
+						}
+						LeftTorque = (Mathf.Clamp (forward - steer, -1, 1) * TorqueCurve.Evaluate (LeftTrack.RPM));
+						LeftTrack.ApplyTorque (LeftTorque);
 					}
-					LeftTorque = (Mathf.Clamp (forward - steer, -1, 1) * TorqueCurve.Evaluate (LeftTrack.RPM));
-					LeftTrack.ApplyTorque (LeftTorque);
+
+					if (bIsRightTrackEnabled)
+					{
+						if (bIsCruiseEnabled && RightTrack.RPM < CruiseTargetRPM)
+						{
+							forward = RightTrack.RPM / CruiseTargetRPM;
+						}
+						RightTorque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (RightTrack.RPM));
+						RightTrack.ApplyTorque (RightTorque);
+					}
 				}
-
-				if(bIsRightTrackEnabled)
+				else
 				{
-					if (bIsCruiseEnabled && RightTrack.RPM < CruiseTargetRPM)
-					{
-						forward = RightTrack.RPM / CruiseTargetRPM;
-					}
-					RightTorque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (RightTrack.RPM));
-					RightTrack.ApplyTorque (RightTorque);
+					if (LeftTrack == null)
+						Debuggar.Error ("LeftTrack is null");
+					if (RightTrack == null)
+						Debuggar.Error ("RightTrack is null");
 				}
 			}
 		}

@@ -25,6 +25,7 @@ namespace Trackar
 			Travel = travel;
 			TravelCenter = travelCenter;
 			Damper = damper;
+
 			Debuggar.Message ("SuspConfigContainer spawned: Travel = " + Travel.ToString () + " TravelCenter = " + TravelCenter.ToString () + " Damper = " + Damper.ToString ());
 		}
 	}
@@ -46,6 +47,7 @@ namespace Trackar
 		{
 			BrakingTorque = brakingTorque;
 			RollingResistance = rollingResistance;
+
 			SuspConfig = new SuspConfigContainer ();
 			Debuggar.Message ("WheelDummyConfigContainer spawned: BrakingTorque = " + BrakingTorque.ToString () + " RollingResistance = " + RollingResistance.ToString ());
 		}
@@ -54,17 +56,13 @@ namespace Trackar
 		{
 			BrakingTorque = brakingTorque;
 			RollingResistance = rollingResistance;
-			if (suspConfig != null)
-			{
-				SuspConfig = suspConfig;
-			}
-			else
-			{
-				Debuggar.Error ("Attempted to spawn a WheelDummyConfigContainer with a null SuspConfigContainer");
-				SuspConfig = new SuspConfigContainer ();
-			}
-			Debuggar.Message ("WheelDummyConfigContainer spawned: BrakingTorque = " + BrakingTorque.ToString () + " RollingResistance = " + RollingResistance.ToString ());
 
+			if (suspConfig != null)
+				SuspConfig = suspConfig;
+			else
+				SuspConfig = new SuspConfigContainer ();
+
+			Debuggar.Message ("WheelDummyConfigContainer spawned: BrakingTorque = " + BrakingTorque.ToString () + " RollingResistance = " + RollingResistance.ToString ());
 		}
 	}
 
@@ -118,6 +116,7 @@ namespace Trackar
 		{
 			Width = width;
 			Length = length;
+
 			ModelConfig = new ModelConfigContainer ();
 			WheelDummyConfig = new WheelDummyConfigContainer ();
 			Debuggar.Message ("TrackConfigContainer spawned: Width = " + Width.ToString () + " Length = " + Length.ToString ());
@@ -127,24 +126,17 @@ namespace Trackar
 		{
 			Width = width;
 			Length = length;
+
 			if (modelConfig != null)
-			{
 				ModelConfig = modelConfig;
-			}
 			else
-			{
-				Debuggar.Error ("Attempted to spawn a TrackConfigContainer with a null ModelConfig");
 				ModelConfig = new ModelConfigContainer ();
-			}
+
 			if(wheelDummyConfig != null)
-			{
 				WheelDummyConfig = wheelDummyConfig;
-			}
 			else
-			{
-				Debuggar.Error ("Attempted to spawn a TrackConfigContainer with a null WheelDummyConfig");
 				WheelDummyConfig = new WheelDummyConfigContainer ();
-			}
+
 			Debuggar.Message ("TrackConfigContainer spawned: Width = " + Width.ToString () + " Length = " + Length.ToString ());
 		}
 	}

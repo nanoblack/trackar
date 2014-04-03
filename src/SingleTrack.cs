@@ -48,13 +48,8 @@ namespace Trackar
 				{
 					if(!bIsMirrorInstance)
 					{
-
 						module.bIsMirrorInstance = true;
 						Debuggar.Message ("Setting instance " + Convert.ToString(counterpart.GetInstanceID()) + " as a mirror instance");
-					}
-					else
-					{
-						Debuggar.Message ("Instance " + Convert.ToString(counterpart.GetInstanceID()) + " is already claimed as this module's mirror instance");
 					}
 				}
 				else
@@ -69,7 +64,6 @@ namespace Trackar
 			Debuggar.Message ("SingleTrack module successfully started");
 		}
 
-		// why this work in editor but OnUpdate does not?
 		public void OnEditorAttachEvent()
 		{
 			dbgPartX = this.part.transform.position.x;
