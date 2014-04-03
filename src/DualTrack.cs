@@ -1,9 +1,3 @@
-//=============================================================
-// Straw dumb blonde, brown licorice candy girl I is
-// Dot connector, paint a picture
-// I'm not in it, never will be 
-//=============================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;

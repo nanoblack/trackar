@@ -1,15 +1,10 @@
-//=============================================================
-// We mash up the place, turn up the bass
-// And mek sum soundboy run
-// And we will end your week just like a Sunday
-//=============================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 using UnityEngine;
+
 
 namespace Trackar
 {

@@ -1,9 +1,3 @@
-//=============================================================
-// Back to bring-a-booksville
-// We've all been there, what's the next stop?
-// I won't sit still 
-//=============================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;

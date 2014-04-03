@@ -1,9 +1,3 @@
-//=============================================================
-// Break your bones when you come down
-// You're a one trick mind trick pony
-// Who's next to hop on the ride ride ride... 
-//=============================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +22,7 @@ namespace Trackar
 		public float dbgPartY = 0;
 		[KSPField(guiName = "Z position", guiFormat = "F1", guiActiveEditor = Debuggar.bIsDebugMode)]
 		public float dbgPartZ = 0;
-		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "bIsTrackLeftSide")]
+		[KSPField(isPersistant = true, guiActive = Debuggar.bIsDebugMode, guiActiveEditor = Debuggar.bIsDebugMode, guiName = "bIsTrackLeftSide")]
 		public bool bIsTrackLeftSide = true;
 
 		private Callback EditorAttachEventHandler;
@@ -66,7 +60,6 @@ namespace Trackar
 			Debuggar.Message ("SingleTrack module successfully started");
 		}
 
-		// why this work in editor but OnUpdate does not?
 		public void OnEditorAttachEvent()
 		{
 			dbgPartX = this.part.transform.position.x;
@@ -98,7 +91,6 @@ namespace Trackar
 				{
 					foreach (Track track in Tracks)
 					{
-						// I assume these have to be negated immediately like this because the right side is being claimed as mirror?
 						float steer = -2 * this.vessel.ctrlState.wheelSteer;
 						float forward = this.vessel.ctrlState.wheelThrottle;
 

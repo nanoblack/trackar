@@ -1,9 +1,3 @@
-//=============================================================
-// Pump the brakes, you're a red flag red light
-// Holdin' up a stop sign, I'll never be sloppy seconds
-// Go ahead and take 'em back, your one, two, three minutes 
-//=============================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,8 +40,6 @@ namespace Trackar
 
 		public bool bIsMirrorInstance = false;
 
-		// I'd say this list is unnecessary but it does make it simple for this base class to implement common methods that interact with Track instances regardless of count
-		// It is a bit excessive though
 		public List<Track> Tracks = new List<Track>();
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
@@ -56,11 +48,11 @@ namespace Trackar
 		public float CruiseTargetRPM = 0;
 		public KSPActionGroup CruiseActionGroup;
 
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTargetPosition"), UI_FloatRange(minValue = -4, maxValue = 0, stepIncrement = 0.25f)]
+		[KSPField(guiActive = Debuggar.bIsDebugMode, guiActiveEditor = Debuggar.bIsDebugMode, guiName = "dbgTargetPosition"), UI_FloatRange(minValue = -4, maxValue = 0, stepIncrement = 0.25f)]
 		public float dbgTargetPosition = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgTravel"), UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
+		[KSPField(guiActive = Debuggar.bIsDebugMode, guiActiveEditor = Debuggar.bIsDebugMode, guiName = "dbgTravel"), UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
 		public float dbgTravel = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "dbgDamping"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
+		[KSPField(guiActive = Debuggar.bIsDebugMode, guiActiveEditor = Debuggar.bIsDebugMode, guiName = "dbgDamping"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
 		public float dbgDamping = 0;
 
 		public TrackConfigContainer TrackConfig;
@@ -137,7 +129,6 @@ namespace Trackar
 
 			foreach (Track track in Tracks)
 			{
-				//track.Susp = susp;
 				track.FixedUpdate ();
 			}
 		}
@@ -149,16 +140,10 @@ namespace Trackar
 				foreach (Track track in Tracks)
 					track.Update ();
 			}
-
-			//if(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor)
-				//DispatchProceduralUpdate ();
-
-			//base.OnUpdate ();
 		}
 
 		public override void OnLoad (ConfigNode node)
 		{
-			//DispatchProceduralUpdate ();
 			base.OnLoad (node);
 		}
 

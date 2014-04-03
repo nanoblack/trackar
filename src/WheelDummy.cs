@@ -1,9 +1,3 @@
-//=============================================================
-// We mash up the place, turn up the bass
-// And mek dem all have fun
-// A-we ablaze the fire, make it bun dem
-//=============================================================
-
 using System;
 using System.Collections.Generic;
 

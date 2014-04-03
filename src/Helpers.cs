@@ -1,9 +1,3 @@
-//=============================================================
-// Nope can't be me, get your freak on, you can suck it
-// They've all seen it and you liked it, now he wants it 
-// Cotton candy suga high
-//=============================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +16,7 @@ namespace Trackar
 
 	public static class Debuggar
 	{
-		public const bool bIsDebugMode = true;
+		public const bool bIsDebugMode = false;
 
 		public static void Message(string message)
 		{
