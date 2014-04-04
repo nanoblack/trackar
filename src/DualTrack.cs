@@ -22,6 +22,13 @@ namespace Trackar
 			UI_Toggle(disabledText="Disabled", enabledText="Enabled")]
 		public bool bIsRightTrackEnabled = true;
 
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert Left Track Motor"),
+			UI_Toggle(disabledText="No", enabledText="Yes")]
+		public bool bInvertLeftTrack = false;
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert Right Track Motor"),
+			UI_Toggle(disabledText="No", enabledText="Yes")]
+		public bool bInvertRightTrack = false;
+
 		public Track LeftTrack;
 		public Track RightTrack;
 
@@ -49,7 +56,7 @@ namespace Trackar
 				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, false);
 				Tracks.Add (RightTrack);
 			}
-			Debuggar.Message ("DualTrack module successfully started");
+			Debuggar.Message ("DualTrack in OnStart(): module successfully started");
 		}
 
 		public override void FixedUpdate ()
@@ -57,38 +64,60 @@ namespace Trackar
 
 			base.FixedUpdate ();
 
-			if(HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
+			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
-				float steer = 2 * this.vessel.ctrlState.wheelSteer;
-				float forward = this.vessel.ctrlState.wheelThrottle;
-
-				LeftTrackRPM = LeftTrack.RPM;
-				RightTrackRPM = RightTrack.RPM;
-
-				// need to do something with this, that drift is annoying
-				RevmatchError = LeftTrackRPM - RightTrackRPM;
-
-				LeftTorque = 0;
-				RightTorque = 0;
-
-				if (bIsLeftTrackEnabled)
+				if (LeftTrack != null && RightTrack != null)
 				{
-					if (bIsCruiseEnabled && LeftTrack.RPM < CruiseTargetRPM)
+					float steer = 2 * this.vessel.ctrlState.wheelSteer;
+					float leftForward = this.vessel.ctrlState.wheelThrottle;
+					float rightForward = this.vessel.ctrlState.wheelThrottle;
+
+					LeftTrackRPM = LeftTrack.RPM;
+					RightTrackRPM = RightTrack.RPM;
+
+					// need to do something with this, that drift is annoying
+					RevmatchError = LeftTrackRPM - RightTrackRPM;
+
+					LeftTorque = 0;
+					RightTorque = 0;
+
+					if (bIsLeftTrackEnabled)
 					{
-						forward = LeftTrack.RPM / CruiseTargetRPM;
+						if (bIsCruiseEnabled && LeftTrack.RPM < CruiseTargetRPM)
+							leftForward = LeftTrack.RPM / CruiseTargetRPM;
+						
+						if (bInvertLeftTrack)
+							leftForward *= -1;
+
 					}
-					LeftTorque = (Mathf.Clamp (forward - steer, -1, 1) * TorqueCurve.Evaluate (LeftTrack.RPM));
+
+					if (bIsRightTrackEnabled)
+					{
+						if (bIsCruiseEnabled && RightTrack.RPM < CruiseTargetRPM)
+							rightForward = RightTrack.RPM / CruiseTargetRPM;
+
+						if (bInvertRightTrack)
+							rightForward *= -1;
+
+					}
+
+					LeftTorque = (Mathf.Clamp (leftForward - steer, -1, 1) * TorqueCurve.Evaluate (LeftTrack.RPM));
+					RightTorque = (Mathf.Clamp (rightForward + steer, -1, 1) * TorqueCurve.Evaluate (RightTrack.RPM));
+
+					if ((LeftTrackRPM > RightTrackRPM && RightTrackRPM >= 100) && steer == 0)
+						LeftTorque -= LeftTorque * (Mathf.Clamp(LeftTrackRPM - RightTrackRPM, 0, 1));
+					else if ((RightTrackRPM > LeftTrackRPM && LeftTrackRPM >= 100) && steer == 0)
+						RightTorque -= RightTorque * (Mathf.Clamp(RightTrackRPM - LeftTrackRPM, 0, 1));
+
 					LeftTrack.ApplyTorque (LeftTorque);
-				}
-
-				if(bIsRightTrackEnabled)
-				{
-					if (bIsCruiseEnabled && RightTrack.RPM < CruiseTargetRPM)
-					{
-						forward = RightTrack.RPM / CruiseTargetRPM;
-					}
-					RightTorque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (RightTrack.RPM));
 					RightTrack.ApplyTorque (RightTorque);
+				}
+				else
+				{
+					if (LeftTrack == null)
+						Debuggar.Error ("DualTrack in FixedUpdate(): LeftTrack is null");
+					if (RightTrack == null)
+						Debuggar.Error ("DualTrack in FixedUpdate(): RightTrack is null");
 				}
 			}
 		}

@@ -24,22 +24,22 @@ namespace Trackar
 			// if any of these are tripped, the WheelDummy will be basically useless, but that's better than it being definitely useless with NullReferences Everywhere
 			if (col == null)
 			{
-				Debuggar.Error ("Attempted to spawn a WheelDummy with a null WheelCollider");
+				Debuggar.Error ("WheelDummy: Attempted spawn with null WheelCollider");
 				col = new WheelCollider ();
 			}
 			if(joint == null)
 			{
-				Debuggar.Error ("Attempted to spawn a WheelDummy with a null Joint");
+				Debuggar.Error ("WheelDummy: Attempted spawn with null Joint");
 				joint = new GameObject ().transform; // lol gg unity
 			}
 			if(model == null)
 			{
-				Debuggar.Error ("Attempted to spawn a WheelDummy with a null Model");
+				Debuggar.Error ("WheelDummy: Attempted spawn with null Model");
 				model = new GameObject ();
 			}
 			if(config == null)
 			{
-				Debuggar.Error ("Attempted to spawn a WheelDummy with a null WheelDummyConfigContainer");
+				Debuggar.Error ("WheelDummy: Attempted spawn with null WheelDummyConfigContainer");
 				config = new WheelDummyConfigContainer ();
 			}
 
@@ -51,7 +51,7 @@ namespace Trackar
 			Collider.brakeTorque = config.RollingResistance;
 			Collider.enabled = true;
 
-			Debuggar.Message ("WheelDummy spawned");
+			Debuggar.Message ("WheelDummy: Spawned");
 		}
 
 		public void Rotate(float rpm)
@@ -59,7 +59,10 @@ namespace Trackar
 			float deg = (rpm / 60) * 360;
 			float delta = deg * Time.deltaTime;
 			float rot = delta / Collider.radius;
-			WheelModel.transform.Rotate(Vector3.right, rot);
+			if(WheelModel != null)
+				WheelModel.transform.Rotate(Vector3.right, rot);
+			else
+				Debuggar.Error("WheelDummy in Rotate(): WheelModel is null");
 		}
 
 		// WHEN AM I GOING TO EVER HAVE SOME SORT OF FUNCTIONAL SUSPENSION UP IN HURR

@@ -20,14 +20,14 @@ namespace Trackar
 
 		public static void Message(string message)
 		{
-			if (bIsDebugMode)
-				Debug.Log("Trackar: " + message);
+			//if (bIsDebugMode)
+			Debug.Log("Trackar: " + message);
 		}
 
 		public static void Error(string message)
 		{
-			if (bIsDebugMode)
-				Debug.Log ("Trackar GURU MEDITATION: " + message);
+			//if (bIsDebugMode)
+			Debug.Log ("Trackar GURU MEDITATION: " + message);
 		}
 	}
 }

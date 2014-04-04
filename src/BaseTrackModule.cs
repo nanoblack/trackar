@@ -40,6 +40,8 @@ namespace Trackar
 
 		public bool bIsMirrorInstance = false;
 
+		// I'd say this list is unnecessary but it does make it simple for this base class to implement common methods that interact with Track instances regardless of count
+		// It is a bit excessive though
 		public List<Track> Tracks = new List<Track>();
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
@@ -80,56 +82,73 @@ namespace Trackar
 					CruiseActionGroup = action.actionGroup;
 			}
 			InitBaseTrackModule ();
-			Debuggar.Message ("BaseTrackModule module successfully started");
+			Debuggar.Message ("BaseTrackModule in OnStart(): Module successfully started");
 		}
 
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
 		public void Brake(KSPActionParam param)
 		{
-			if (param.type == KSPActionType.Activate)
+			if (Tracks.Count != 0)
 			{
-				if (bIsCruiseEnabled)
+				if (param.type == KSPActionType.Activate)
 				{
-					this.vessel.ActionGroups.ToggleGroup (CruiseActionGroup);
+					if (bIsCruiseEnabled)
+					{
+						this.vessel.ActionGroups.ToggleGroup (CruiseActionGroup);
+					}
+
+					foreach (Track track in Tracks)
+						track.Brakes (true);
+				} else
+				{
+					foreach (Track track in Tracks)
+						track.Brakes (false);
 				}
 
 				foreach (Track track in Tracks)
 					track.Brakes (true);
 			}
-			else
-			{
-				foreach (Track track in Tracks)
-					track.Brakes (false);
-			}
+			else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list empty");
 		}
 
 		[KSPAction("Toggle Cruise Control", KSPActionGroup.None)]
 		public void ToggleCruiseControl(KSPActionParam param)
 		{
-			if (param.type == KSPActionType.Activate)
+			if (Tracks.Count != 0)
 			{
-				bIsCruiseEnabled = true;
-				foreach (Track track in Tracks)
-					if (CruiseTargetRPM < track.RPM)
-						CruiseTargetRPM = track.RPM;
+				if (param.type == KSPActionType.Activate)
+				{
+					bIsCruiseEnabled = true;
+					foreach (Track track in Tracks)
+						if (CruiseTargetRPM < track.RPM)
+							CruiseTargetRPM = track.RPM;
+				} else
+				{
+					bIsCruiseEnabled = false;
+					CruiseTargetRPM = 0;
+				}
 			}
-			else
-			{
-				bIsCruiseEnabled = false;
-				CruiseTargetRPM = 0;
-			}
+			else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list empty");
 		}
 
 		public virtual void FixedUpdate ()
 		{
-			SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
-			suspConfig.Damper = dbgDamping;
-			suspConfig.Travel = dbgTravel;
-			suspConfig.TravelCenter = dbgTargetPosition;
-
-			foreach (Track track in Tracks)
+			if (HighLogic.LoadedSceneIsFlight)
 			{
-				track.FixedUpdate ();
+				SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
+				suspConfig.Damper = dbgDamping;
+				suspConfig.Travel = dbgTravel;
+				suspConfig.TravelCenter = dbgTargetPosition;
+
+				if (Tracks.Count != 0)
+				{
+					foreach (Track track in Tracks)
+					{
+						//track.Susp = susp;
+						track.FixedUpdate ();
+					}
+				}
+				else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list empty");
 			}
 		}
 
@@ -137,9 +156,18 @@ namespace Trackar
 		{
 			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
-				foreach (Track track in Tracks)
-					track.Update ();
+				if (Tracks.Count != 0)
+				{
+					foreach (Track track in Tracks)
+						track.Update ();
+				}
+				else Debuggar.Error ("BaseTrackModule in Update(): Tracks list empty");
 			}
+
+			//if(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor)
+				//DispatchProceduralUpdate ();
+
+			//base.OnUpdate ();
 		}
 
 		public override void OnLoad (ConfigNode node)
