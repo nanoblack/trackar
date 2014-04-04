@@ -136,20 +136,23 @@ namespace Trackar
 
 		public virtual void FixedUpdate ()
 		{
-			SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
-			suspConfig.Damper = dbgDamping;
-			suspConfig.Travel = dbgTravel;
-			suspConfig.TravelCenter = dbgTargetPosition;
-
-			if (Tracks.Count != 0)
+			if (HighLogic.LoadedSceneIsFlight)
 			{
-				foreach (Track track in Tracks)
+				SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
+				suspConfig.Damper = dbgDamping;
+				suspConfig.Travel = dbgTravel;
+				suspConfig.TravelCenter = dbgTargetPosition;
+
+				if (Tracks.Count != 0)
 				{
-					//track.Susp = susp;
-					track.FixedUpdate ();
+					foreach (Track track in Tracks)
+					{
+						//track.Susp = susp;
+						track.FixedUpdate ();
+					}
 				}
+				else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list empty");
 			}
-			else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list empty");
 		}
 
 		public virtual void Update ()
