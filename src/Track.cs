@@ -12,7 +12,12 @@ namespace Trackar
 	{
 		public float WidthScale = 1;
 
-		public float RPM = 0.0f;
+		public float RPM = 0;
+		public float RealRPM = 0;
+
+		public float Torque = 0;
+
+		public bool bApplyBrakes = false;
 
 		public bool bIsMirror = false;
 
@@ -21,7 +26,7 @@ namespace Trackar
 		public Transform TrackTransform;
 		public Transform TrackSurfaceTransform;
 
-		public WheelDummyList WheelDummies;
+		public List<WheelDummy> WheelDummies = new List<WheelDummy> ();
 
 		public TrackConfigContainer Config;
 
@@ -37,10 +42,8 @@ namespace Trackar
 
 			Component[] components = Root.GetComponentsInChildren<Component> ();
 
-			WheelDummies = new WheelDummyList (components, Config.WheelDummyConfig, Config.ModelConfig);
+			InitWheelDummyList (components, Config);
 
-			// this can probably be slimmed down a bit, a full blown foreach isn't needed here anymore
-			// i mean come on, we're looking for ONE COMPONENT but looking through ALL OF THEM
 			foreach (Component o in components)
 			{
 				if (o.name.StartsWith (Config.ModelConfig.TrackSurface))
@@ -57,15 +60,75 @@ namespace Trackar
 			Debuggar.Message ("Track: Spawned");
 		}
 
+		public void InitWheelDummyList (Component[] components, TrackConfigContainer config)
+		{
+			Dictionary<int,GameObject> wheelObjects = new Dictionary<int, GameObject>();
+			Dictionary<int,WheelCollider> wheelColliders = new Dictionary<int, WheelCollider>();
+			Dictionary<int,Transform> suspJoints = new Dictionary<int, Transform>();
+
+			Config = config; // lolcase
+
+			if (components != null)
+			{
+				foreach (Component o in components)
+				{
+					if (o.name.StartsWith (Config.ModelConfig.WheelModel) && o is MeshFilter)
+					{
+						int wheelNumber = Convert.ToInt32 (o.name.Substring (Config.ModelConfig.WheelModel.Length));
+						wheelObjects.Add (wheelNumber, o.gameObject);
+					}
+
+					if (o.name.StartsWith (Config.ModelConfig.WheelCollider) && o is WheelCollider)
+					{
+						int wheelNumber = Convert.ToInt32 (o.name.Substring (Config.ModelConfig.WheelCollider.Length));
+						wheelColliders.Add (wheelNumber, o as WheelCollider);
+					}
+
+					if (o.name.StartsWith (Config.ModelConfig.Joint) && o is Transform)
+					{
+						int jointNumber = Convert.ToInt32 (o.name.Substring (Config.ModelConfig.Joint.Length));
+						suspJoints.Add (jointNumber, o as Transform);
+					}
+				}
+				foreach (KeyValuePair<int, WheelCollider> i in wheelColliders)
+				{
+					int number = i.Key;
+					WheelCollider collider = i.Value;
+					Config.WheelDummyConfig.SuspConfig.Damper = collider.suspensionSpring.damper;
+					Config.WheelDummyConfig.SuspConfig.Travel = collider.suspensionDistance;
+					Config.WheelDummyConfig.SuspConfig.TravelCenter = collider.suspensionSpring.targetPosition;
+					WheelDummies.Add (new WheelDummy (collider, suspJoints [number], wheelObjects [number], Config.WheelDummyConfig));
+				}
+				Debuggar.Message ("Track in InitWheelDummyList(): " + WheelDummies.Count.ToString () + " WheelDummies");
+			}
+			else Debuggar.Error ("Track in InitWheelDummyList(): Received null components");
+		}
+
 		public void Update()
 		{
 			if (WheelDummies != null)
 			{
-				WheelDummies.Update ();
-				RPM = WheelDummies.RPM;
+				bool bIsOnGround = IsOnGround ();
+
+				if (WheelDummies.Count != 0)
+				{
+					foreach (WheelDummy wheelDummy in WheelDummies)
+					{
+						if (bIsOnGround)
+						{
+							RealRPM = wheelDummy.Collider.rpm * wheelDummy.Collider.radius;
+						}
+						RPM = Mathf.Abs (RealRPM);
+						if(bIsMirror)
+							wheelDummy.Rotate (-RealRPM);
+						else
+							wheelDummy.Rotate (RealRPM);
+					}
+				}
+				else Debuggar.Error ("Track in Update(): WheelDummies list is empty");
 
 				// this needs to be done much different
-				float distanceTravelled = (float)((WheelDummies.RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
+				float distanceTravelled = (float)((RealRPM * 2 * Math.PI) / 60) * Time.deltaTime;
 				Material trackMaterial = TrackSurface.renderer.material;
 				Vector2 textureOffset = trackMaterial.mainTextureOffset;
 				textureOffset = textureOffset + new Vector2 (-distanceTravelled / Config.Length, 0);
@@ -75,36 +138,63 @@ namespace Trackar
 			else Debuggar.Error ("Track in Update(): WheelDummies is null");
 		}
 
+		public bool IsOnGround()
+		{
+			if (WheelDummies.Count != 0)
+			{
+				foreach (WheelDummy wheel in WheelDummies)
+				{
+					if (wheel.Collider.isGrounded)
+						return true; // return asap, if one is on ground consider them all on ground
+				}
+				return false; // this should only happen when ALL wheels in this set are off ground
+			}
+			else
+			{
+				Debuggar.Error ("Track in IsOnGround(): WheelDummies list is empty");
+				return false;
+			}
+		}
+
 		public void FixedUpdate ()
 		{
 			if (WheelDummies != null)
 			{
-				WheelDummies.FixedUpdate ();
+				if (WheelDummies.Count != 0)
+				{
+					foreach (WheelDummy wheelDummy in WheelDummies)
+					{
+						wheelDummy.Collider.motorTorque = Torque;
+
+						if(bApplyBrakes)
+							wheelDummy.Collider.brakeTorque = Config.WheelDummyConfig.BrakingTorque;
+						else
+							wheelDummy.Collider.brakeTorque = Config.WheelDummyConfig.RollingResistance; // lets just spam this at it and see if it finally fucking sticks eh?
+					}
+				}
+				else Debuggar.Error ("Track in FixedUpdate(): WheelDummies list is empty");
 			}
 			else Debuggar.Error ("Track in FixedUpdate(): WheelDummies is null");
 		}
 
-		// I think this can be done a bit better
-		public void Brakes(bool active)
+		public void AdjustSuspensionDamper(float value)
 		{
-			if (WheelDummies != null)
-			{
-				if (active)
-					WheelDummies.BrakingTorque = Config.WheelDummyConfig.BrakingTorque;
-				else
-					WheelDummies.BrakingTorque = Config.WheelDummyConfig.RollingResistance;
-			}
-			else Debuggar.Error ("Track in Brakes(): WheelDummies is null");
+
 		}
 
-		// as can this
-		public void ApplyTorque(float torque)
+		public void AdjustSuspensionSpring(float value)
 		{
-			if (WheelDummies != null)
-				WheelDummies.Torque = torque;
-			else
-				Debuggar.Error ("Track in ApplyTorque(): WheelDummies is null");
+
+		}
+
+		public void AdjustSuspensionHeight(float value)
+		{
+
+		}
+
+		public void AdjustSuspensionTravelMax(float value)
+		{
+
 		}
 	}
 }
-

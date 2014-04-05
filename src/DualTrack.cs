@@ -50,10 +50,10 @@ namespace Trackar
 
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				LeftTrack = new Track (part.FindModelTransform (LeftTrackRoot), TrackConfig, true);
+				LeftTrack = new Track (part.FindModelTransform (LeftTrackRoot), TrackConfig, false);
 				Tracks.Add (LeftTrack); // can this List be done away with yet? ugh
 
-				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, false);
+				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, true);
 				Tracks.Add (RightTrack);
 			}
 			Debuggar.Message ("DualTrack in OnStart(): module successfully started");
@@ -75,7 +75,6 @@ namespace Trackar
 					LeftTrackRPM = LeftTrack.RPM;
 					RightTrackRPM = RightTrack.RPM;
 
-					// need to do something with this, that drift is annoying
 					RevmatchError = LeftTrackRPM - RightTrackRPM;
 
 					LeftTorque = 0;
@@ -85,10 +84,11 @@ namespace Trackar
 					{
 						if (bIsCruiseEnabled && LeftTrack.RPM < CruiseTargetRPM)
 							leftForward = LeftTrack.RPM / CruiseTargetRPM;
-						
+
 						if (bInvertLeftTrack)
 							leftForward *= -1;
 
+						LeftTorque = (Mathf.Clamp (leftForward - steer, -1, 1) * TorqueCurve.Evaluate (LeftTrack.RPM));
 					}
 
 					if (bIsRightTrackEnabled)
@@ -99,18 +99,16 @@ namespace Trackar
 						if (bInvertRightTrack)
 							rightForward *= -1;
 
+						RightTorque = (Mathf.Clamp (rightForward + steer, -1, 1) * TorqueCurve.Evaluate (RightTrack.RPM));
 					}
-
-					LeftTorque = (Mathf.Clamp (leftForward - steer, -1, 1) * TorqueCurve.Evaluate (LeftTrack.RPM));
-					RightTorque = (Mathf.Clamp (rightForward + steer, -1, 1) * TorqueCurve.Evaluate (RightTrack.RPM));
 
 					if ((LeftTrackRPM > RightTrackRPM && RightTrackRPM >= 100) && steer == 0)
 						LeftTorque -= LeftTorque * (Mathf.Clamp(LeftTrackRPM - RightTrackRPM, 0, 1));
 					else if ((RightTrackRPM > LeftTrackRPM && LeftTrackRPM >= 100) && steer == 0)
 						RightTorque -= RightTorque * (Mathf.Clamp(RightTrackRPM - LeftTrackRPM, 0, 1));
 
-					LeftTrack.ApplyTorque (LeftTorque);
-					RightTrack.ApplyTorque (RightTorque);
+					LeftTrack.Torque = LeftTorque;
+					RightTrack.Torque = RightTorque;
 				}
 				else
 				{

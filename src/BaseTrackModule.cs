@@ -13,15 +13,16 @@ namespace Trackar
 		public float TrackWidth = 1;
 
 		public float TrackSections = 4;
+
 		[KSPField]
-		public float TrackLength = 15;
+		public float TrackLength;
 
 		public float TrackThickness = 0.0f;
 
 		[KSPField]
-		public float BrakingTorque = 1.0f;
+		public float BrakingTorque;
 		[KSPField]
-		public float RollingResistance = 0.1f;
+		public float RollingResistance;
 		[KSPField]
 		public FloatCurve TorqueCurve = new FloatCurve();
 
@@ -40,8 +41,6 @@ namespace Trackar
 
 		public bool bIsMirrorInstance = false;
 
-		// I'd say this list is unnecessary but it does make it simple for this base class to implement common methods that interact with Track instances regardless of count
-		// It is a bit excessive though
 		public List<Track> Tracks = new List<Track>();
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
@@ -50,19 +49,21 @@ namespace Trackar
 		public float CruiseTargetRPM = 0;
 		public KSPActionGroup CruiseActionGroup;
 
-		[KSPField(guiActive = Debuggar.bIsDebugMode, guiActiveEditor = Debuggar.bIsDebugMode, guiName = "dbgTargetPosition"), UI_FloatRange(minValue = -4, maxValue = 0, stepIncrement = 0.25f)]
-		public float dbgTargetPosition = 0;
-		[KSPField(guiActive = Debuggar.bIsDebugMode, guiActiveEditor = Debuggar.bIsDebugMode, guiName = "dbgTravel"), UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
-		public float dbgTravel = 0;
-		[KSPField(guiActive = Debuggar.bIsDebugMode, guiActiveEditor = Debuggar.bIsDebugMode, guiName = "dbgDamping"), UI_FloatRange(minValue = -4, maxValue = 4, stepIncrement = 0.25f)]
-		public float dbgDamping = 0;
+		[KSPField(guiName = "Suspension Damping", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float dbgSuspensionDamping = 0;
+		[KSPField(guiName = "Suspension Spring", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float dbgSuspensionSpring = 0;
+		[KSPField(guiName = "Suspension Target Position", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float dbgSuspensionTargetPos = 0;
+		[KSPField(guiName = "Suspension Travel", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float dbgSuspensionTravel = 0;
 
 		public TrackConfigContainer TrackConfig;
 
 		public void InitBaseTrackModule()
 		{
-			SuspConfigContainer SuspConfig = new SuspConfigContainer (dbgTravel, dbgTargetPosition, dbgDamping);
-			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
+
+			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance);
 			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
 
 			TrackConfig = new TrackConfigContainer (TrackWidth, TrackLength, ModelConfig, WheelDummyConfig);
@@ -98,15 +99,12 @@ namespace Trackar
 					}
 
 					foreach (Track track in Tracks)
-						track.Brakes (true);
+						track.bApplyBrakes = true;
 				} else
 				{
 					foreach (Track track in Tracks)
-						track.Brakes (false);
+						track.bApplyBrakes = false;
 				}
-
-				foreach (Track track in Tracks)
-					track.Brakes (true);
 			}
 			else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list empty");
 		}
@@ -136,15 +134,15 @@ namespace Trackar
 			if (HighLogic.LoadedSceneIsFlight)
 			{
 				SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
-				suspConfig.Damper = dbgDamping;
-				suspConfig.Travel = dbgTravel;
-				suspConfig.TravelCenter = dbgTargetPosition;
+
+				dbgSuspensionDamping = suspConfig.Damper;
+				dbgSuspensionTravel = suspConfig.Travel;
+				dbgSuspensionTargetPos = suspConfig.TravelCenter;
 
 				if (Tracks.Count != 0)
 				{
 					foreach (Track track in Tracks)
 					{
-						//track.Susp = susp;
 						track.FixedUpdate ();
 					}
 				}
@@ -154,20 +152,26 @@ namespace Trackar
 
 		public virtual void Update ()
 		{
-			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
+			if (HighLogic.LoadedSceneIsFlight)
 			{
-				if (Tracks.Count != 0)
+				if (this.vessel != null)
 				{
-					foreach (Track track in Tracks)
-						track.Update ();
+					if (this.vessel.isActiveVessel)
+					{
+						if (Tracks != null)
+						{
+							if (Tracks.Count != 0)
+							{
+								foreach (Track track in Tracks)
+									track.Update ();
+							} else
+								Debuggar.Error ("BaseTrackModule in Update(): Tracks list empty");
+						} else
+							Debuggar.Error ("BaseTrackModule in Update(): Tracks list is null");
+					}
 				}
-				else Debuggar.Error ("BaseTrackModule in Update(): Tracks list empty");
+				else Debuggar.Error("BaseTrackModule in Update(): this.vessel is null FOR WHY SQUAD");
 			}
-
-			//if(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneIsEditor)
-				//DispatchProceduralUpdate ();
-
-			//base.OnUpdate ();
 		}
 
 		public override void OnLoad (ConfigNode node)

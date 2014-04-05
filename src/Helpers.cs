@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Trackar
 {
-	// lol lonely ol' forgotten struct with one var
+// lol lonely ol' forgotten struct with one var
 	public struct ProcVars
 	{
 		public float Width;
@@ -16,18 +16,18 @@ namespace Trackar
 
 	public static class Debuggar
 	{
-		public const bool bIsDebugMode = false;
+		public const bool bIsDebugMode = true;
 
 		public static void Message(string message)
 		{
-			//if (bIsDebugMode)
-			Debug.Log("Trackar: " + message);
+			if (bIsDebugMode)
+				Debug.Log("Trackar: " + message);
 		}
 
 		public static void Error(string message)
 		{
-			//if (bIsDebugMode)
-			Debug.Log ("Trackar GURU MEDITATION: " + message);
+			if (bIsDebugMode)
+				Debug.Log ("Trackar GURU MEDITATION: " + message);
 		}
 	}
 }
