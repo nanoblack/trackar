@@ -39,6 +39,12 @@ namespace Trackar
 		[KSPField]
 		public string SuspJointName;
 
+		[KSPField]
+		public float SuspensionDamper;
+		[KSPField]
+		public float SuspensionSpring;
+		[KSPField]
+		public float SuspensionHeight;
 
 		public bool bAreBrakesEngaged = false;
 
@@ -76,8 +82,9 @@ namespace Trackar
 
 		public void InitBaseTrackModule()
 		{
+			SuspConfigContainer SuspConfig = new SuspConfigContainer (SuspensionHeight, 0, SuspensionDamper, SuspensionSpring);
 
-			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance);
+			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
 			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
 
 			TrackConfig = new TrackConfigContainer (TrackWidth, TrackLength, ModelConfig, WheelDummyConfig);

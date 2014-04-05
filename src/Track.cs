@@ -97,10 +97,21 @@ namespace Trackar
 				{
 					int number = i.Key;
 					WheelCollider collider = i.Value;
-					Config.WheelDummyConfig.SuspConfig.Damper = collider.suspensionSpring.damper;
-					Config.WheelDummyConfig.SuspConfig.Spring = collider.suspensionSpring.spring;
-					Config.WheelDummyConfig.SuspConfig.Travel = collider.suspensionDistance;
-					Config.WheelDummyConfig.SuspConfig.TravelCenter = collider.suspensionSpring.targetPosition;
+
+					SuspConfigContainer suspConfig = Config.WheelDummyConfig.SuspConfig;
+
+					JointSpring spring = collider.suspensionSpring;
+
+					Debuggar.Message ("Track in InitWheelDummyList(): Original collider settings: damper = " + spring.damper.ToString () + " spring = " + spring.spring.ToString () + " center = " + spring.targetPosition.ToString () + " travel = " + collider.suspensionDistance.ToString ());
+
+					spring.damper = suspConfig.Damper;
+					spring.spring = suspConfig.Spring;
+					spring.targetPosition = suspConfig.TravelCenter;
+
+					collider.suspensionSpring = spring;
+					collider.suspensionDistance = suspConfig.Travel;
+
+					Debuggar.Message ("Track in InitWheelDummyList(): Collider now using: damper = " + spring.damper.ToString () + " spring = " + spring.spring.ToString () + " center = " + spring.targetPosition.ToString () + " travel = " + collider.suspensionDistance.ToString ());
 					WheelDummies.Add (new WheelDummy (collider, suspJoints [number], wheelObjects [number], Config.WheelDummyConfig));
 				}
 				Debuggar.Message ("Track in InitWheelDummyList(): " + WheelDummies.Count.ToString () + " WheelDummies");
