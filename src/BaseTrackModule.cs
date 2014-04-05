@@ -1,3 +1,6 @@
+//=============================================================
+// UNSTABLE
+//=============================================================
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,12 +54,23 @@ namespace Trackar
 
 		[KSPField(guiName = "Suspension Damping", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionDamping = 0;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping Adjust") , UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
+		public float SuspensionDampingAdjustment = 0;
+
 		[KSPField(guiName = "Suspension Spring", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionSpring = 0;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring Adjust") , UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
+		public float SuspensionSpringAdjustment = 0;
+
 		[KSPField(guiName = "Suspension Target Position", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionTargetPos = 0;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Target Position Adjust") , UI_FloatRange(minValue = 0, maxValue = 1, stepIncrement = 0.1f)]
+		public float SuspensionTargetPosAdjustment = 0;
+
 		[KSPField(guiName = "Suspension Travel", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionTravel = 0;
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Travel Adjust") , UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
+		public float SuspensionTravelAdjustment = 0;
 
 		public TrackConfigContainer TrackConfig;
 
@@ -89,44 +103,72 @@ namespace Trackar
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
 		public void Brake(KSPActionParam param)
 		{
-			if (Tracks.Count != 0)
+			if (Tracks != null)
 			{
-				if (param.type == KSPActionType.Activate)
+				if (Tracks.Count != 0)
 				{
-					if (bIsCruiseEnabled)
+					if (param.type == KSPActionType.Activate)
 					{
-						this.vessel.ActionGroups.ToggleGroup (CruiseActionGroup);
-					}
+						if (bIsCruiseEnabled)
+						{
+							this.vessel.ActionGroups.ToggleGroup (CruiseActionGroup);
+						}
 
-					foreach (Track track in Tracks)
-						track.bApplyBrakes = true;
-				} else
-				{
-					foreach (Track track in Tracks)
-						track.bApplyBrakes = false;
+						foreach (Track track in Tracks)
+							track.bApplyBrakes = true;
+					} else
+					{
+						foreach (Track track in Tracks)
+							track.bApplyBrakes = false;
+					}
 				}
+				else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list empty");
 			}
-			else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list empty");
+			else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list is null");
 		}
 
 		[KSPAction("Toggle Cruise Control", KSPActionGroup.None)]
 		public void ToggleCruiseControl(KSPActionParam param)
 		{
-			if (Tracks.Count != 0)
+			if (Tracks != null)
 			{
-				if (param.type == KSPActionType.Activate)
+				if (Tracks.Count != 0)
 				{
-					bIsCruiseEnabled = true;
-					foreach (Track track in Tracks)
-						if (CruiseTargetRPM < track.RPM)
-							CruiseTargetRPM = track.RPM;
-				} else
-				{
-					bIsCruiseEnabled = false;
-					CruiseTargetRPM = 0;
+					if (param.type == KSPActionType.Activate)
+					{
+						bIsCruiseEnabled = true;
+						foreach (Track track in Tracks)
+							if (CruiseTargetRPM < track.RPM)
+								CruiseTargetRPM = track.RPM;
+					} else
+					{
+						bIsCruiseEnabled = false;
+						CruiseTargetRPM = 0;
+					}
 				}
+				else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list empty");
 			}
-			else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list empty");
+			else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list is null");
+		}
+
+		[KSPEvent(guiActive = true, guiName = "Update Suspension")]
+		public void UpdateSuspension()
+		{
+			if (Tracks != null)
+			{
+				if (Tracks.Count != 0)
+				{
+					foreach (Track track in Tracks)
+					{
+						track.AdjustSuspensionDamper (SuspensionDampingAdjustment);
+						track.AdjustSuspensionSpring (SuspensionSpringAdjustment);
+						track.AdjustSuspensionTravelMax (SuspensionTravelAdjustment);
+						track.AdjustSuspensionHeight (SuspensionTargetPosAdjustment);
+					}
+				}
+				else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list empty");
+			}
+			else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list is null");
 		}
 
 		public virtual void FixedUpdate ()
@@ -139,14 +181,18 @@ namespace Trackar
 				dbgSuspensionTravel = suspConfig.Travel;
 				dbgSuspensionTargetPos = suspConfig.TravelCenter;
 
-				if (Tracks.Count != 0)
+				if (Tracks != null)
 				{
-					foreach (Track track in Tracks)
+					if (Tracks.Count != 0)
 					{
-						track.FixedUpdate ();
+						foreach (Track track in Tracks)
+						{
+							track.FixedUpdate ();
+						}
 					}
+					else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list empty");
 				}
-				else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list empty");
+				else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list is null");
 			}
 		}
 
