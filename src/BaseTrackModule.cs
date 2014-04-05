@@ -158,13 +158,13 @@ namespace Trackar
 			{
 				if (Tracks.Count != 0)
 				{
+					TrackConfig.WheelDummyConfig.SuspConfig.Damper = SuspensionDampingAdjustment;
+					TrackConfig.WheelDummyConfig.SuspConfig.Spring = SuspensionSpringAdjustment;
+					TrackConfig.WheelDummyConfig.SuspConfig.TravelCenter = SuspensionTargetPosAdjustment;
+					TrackConfig.WheelDummyConfig.SuspConfig.Travel = SuspensionTravelAdjustment;
+
 					foreach (Track track in Tracks)
-					{
-						track.AdjustSuspensionDamper (SuspensionDampingAdjustment);
-						track.AdjustSuspensionSpring (SuspensionSpringAdjustment);
-						track.AdjustSuspensionTravelMax (SuspensionTravelAdjustment);
-						track.AdjustSuspensionHeight (SuspensionTargetPosAdjustment);
-					}
+						track.UpdateSuspension ();
 				}
 				else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list empty");
 			}
@@ -178,6 +178,7 @@ namespace Trackar
 				SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
 
 				dbgSuspensionDamping = suspConfig.Damper;
+				dbgSuspensionSpring = suspConfig.Spring;
 				dbgSuspensionTravel = suspConfig.Travel;
 				dbgSuspensionTargetPos = suspConfig.TravelCenter;
 

@@ -1,3 +1,6 @@
+//=============================================================
+// UNSTABLE
+//=============================================================
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,6 +98,7 @@ namespace Trackar
 					int number = i.Key;
 					WheelCollider collider = i.Value;
 					Config.WheelDummyConfig.SuspConfig.Damper = collider.suspensionSpring.damper;
+					Config.WheelDummyConfig.SuspConfig.Spring = collider.suspensionSpring.spring;
 					Config.WheelDummyConfig.SuspConfig.Travel = collider.suspensionDistance;
 					Config.WheelDummyConfig.SuspConfig.TravelCenter = collider.suspensionSpring.targetPosition;
 					WheelDummies.Add (new WheelDummy (collider, suspJoints [number], wheelObjects [number], Config.WheelDummyConfig));
@@ -177,24 +181,21 @@ namespace Trackar
 			else Debuggar.Error ("Track in FixedUpdate(): WheelDummies is null");
 		}
 
-		public void AdjustSuspensionDamper(float value)
+		public void UpdateSuspension()
 		{
+			SuspConfigContainer suspConfig = Config.WheelDummyConfig.SuspConfig;
 
-		}
+			foreach (WheelDummy wheelDummy in WheelDummies)
+			{
+				JointSpring newSpring = wheelDummy.Collider.suspensionSpring;
+				newSpring.damper = suspConfig.Damper;
+				newSpring.spring = suspConfig.Spring;
+				newSpring.targetPosition = suspConfig.TravelCenter;
 
-		public void AdjustSuspensionSpring(float value)
-		{
+				wheelDummy.Collider.suspensionSpring = newSpring;
 
-		}
-
-		public void AdjustSuspensionHeight(float value)
-		{
-
-		}
-
-		public void AdjustSuspensionTravelMax(float value)
-		{
-
+				wheelDummy.Collider.suspensionDistance = suspConfig.Travel;
+			}
 		}
 	}
 }

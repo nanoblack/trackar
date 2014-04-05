@@ -1,3 +1,6 @@
+//=============================================================
+// UNSTABLE
+//=============================================================
 using System;
 
 
@@ -7,6 +10,7 @@ namespace Trackar
 	{
 		public float Travel = 0;
 		public float TravelCenter = 0;
+		public float Spring = 0;
 		public float Damper = 0;
 
 		public SuspConfigContainer()
@@ -14,13 +18,14 @@ namespace Trackar
 			Debuggar.Message ("SuspConfigContainer: Spawned empty");
 		}
 
-		public SuspConfigContainer(float travel, float travelCenter, float damper)
+		public SuspConfigContainer(float travel, float travelCenter, float damper, float spring)
 		{
 			Travel = travel;
 			TravelCenter = travelCenter;
 			Damper = damper;
+			Spring = spring;
 
-			Debuggar.Message ("SuspConfigContainer: Spawned with Travel = " + Travel.ToString () + " TravelCenter = " + TravelCenter.ToString () + " Damper = " + Damper.ToString ());
+			Debuggar.Message ("SuspConfigContainer: Spawned with Travel = " + Travel.ToString () + " TravelCenter = " + TravelCenter.ToString () + " Damper = " + Damper.ToString () + " Spring = " + Spring.ToString());
 		}
 	}
 
