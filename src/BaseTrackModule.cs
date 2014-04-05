@@ -54,12 +54,12 @@ namespace Trackar
 
 		[KSPField(guiName = "Suspension Damping", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionDamping = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping Adjust") , UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping Adjust") , UI_FloatRange(minValue = 0, maxValue = 15, stepIncrement = 1f)]
 		public float SuspensionDampingAdjustment = 0;
 
 		[KSPField(guiName = "Suspension Spring", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionSpring = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring Adjust") , UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring Adjust") , UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1)]
 		public float SuspensionSpringAdjustment = 0;
 
 		[KSPField(guiName = "Suspension Target Position", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
@@ -69,7 +69,7 @@ namespace Trackar
 
 		[KSPField(guiName = "Suspension Travel", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionTravel = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Travel Adjust") , UI_FloatRange(minValue = 0, maxValue = 4, stepIncrement = 0.25f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Travel Adjust") , UI_FloatRange(minValue = 0, maxValue = 2, stepIncrement = 0.1f)]
 		public float SuspensionTravelAdjustment = 0;
 
 		public TrackConfigContainer TrackConfig;
