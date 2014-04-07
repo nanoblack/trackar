@@ -235,7 +235,7 @@ namespace Trackar
 
 		public void ConsumeResource(float torque)
 		{
-			float amount = torque * ConsumeResourceRate;
+			float amount = Mathf.Abs (torque * ConsumeResourceRate);
 			this.part.RequestResource (ConsumedResource, amount);
 		}
 
