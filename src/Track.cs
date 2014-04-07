@@ -94,9 +94,21 @@ namespace Trackar
 				{
 					int number = i.Key;
 					WheelCollider collider = i.Value;
-					Config.WheelDummyConfig.SuspConfig.Damper = collider.suspensionSpring.damper;
-					Config.WheelDummyConfig.SuspConfig.Travel = collider.suspensionDistance;
-					Config.WheelDummyConfig.SuspConfig.TravelCenter = collider.suspensionSpring.targetPosition;
+
+					SuspConfigContainer suspConfig = Config.WheelDummyConfig.SuspConfig;
+
+					JointSpring spring = collider.suspensionSpring;
+
+					Debuggar.Message ("Track in InitWheelDummyList(): Original collider settings: damper = " + spring.damper.ToString () + " spring = " + spring.spring.ToString () + " center = " + spring.targetPosition.ToString () + " travel = " + collider.suspensionDistance.ToString ());
+
+					spring.damper = suspConfig.Damper;
+					spring.spring = suspConfig.Spring;
+					spring.targetPosition = suspConfig.TravelCenter;
+
+					collider.suspensionSpring = spring;
+					collider.suspensionDistance = suspConfig.Travel;
+
+					Debuggar.Message ("Track in InitWheelDummyList(): Collider now using: damper = " + spring.damper.ToString () + " spring = " + spring.spring.ToString () + " center = " + spring.targetPosition.ToString () + " travel = " + collider.suspensionDistance.ToString ());
 					WheelDummies.Add (new WheelDummy (collider, suspJoints [number], wheelObjects [number], Config.WheelDummyConfig));
 				}
 				Debuggar.Message ("Track in InitWheelDummyList(): " + WheelDummies.Count.ToString () + " WheelDummies");
@@ -108,18 +120,25 @@ namespace Trackar
 		{
 			if (WheelDummies != null)
 			{
-				bool bIsOnGround = IsOnGround ();
-
 				if (WheelDummies.Count != 0)
 				{
-					foreach (WheelDummy wheelDummy in WheelDummies)
+					/*if (IsOnGround ()) // this whole spot is causing problems
 					{
-						if (bIsOnGround)
+						foreach (WheelDummy wheelDummy in WheelDummies)
 						{
 							RealRPM = wheelDummy.Collider.rpm * wheelDummy.Collider.radius;
+							RPM = Mathf.Abs (RealRPM);
+							if (bIsMirror)
+								wheelDummy.Rotate (-RealRPM);
+							else
+								wheelDummy.Rotate (RealRPM);
 						}
-						RPM = Mathf.Abs (RealRPM);
-						if(bIsMirror)
+					}*/
+					RealRPM = GetTrackRPM ();
+					RPM = Mathf.Abs (RealRPM);
+					foreach(WheelDummy wheelDummy in WheelDummies)
+					{
+						if (bIsMirror)
 							wheelDummy.Rotate (-RealRPM);
 						else
 							wheelDummy.Rotate (RealRPM);
@@ -136,6 +155,32 @@ namespace Trackar
 				trackMaterial.SetTextureOffset ("_BumpMap", textureOffset);
 			}
 			else Debuggar.Error ("Track in Update(): WheelDummies is null");
+		}
+
+		// this needs to get the lowest grounded wheel RPM
+		public float GetTrackRPM()
+		{
+			List<float> RPMlist = new List<float> ();
+			float i = 0;
+			float value = 0; // hooray bad variable descriptions
+			foreach(WheelDummy wheelDummy in WheelDummies)
+			{
+				if(wheelDummy.Collider.isGrounded)
+				{
+					i = wheelDummy.Collider.rpm * wheelDummy.Collider.radius;
+					RPMlist.Add (i);
+				}
+			}
+
+			if (RPMlist.Count != 0)
+			{
+				if (RPMlist.Min () >= 0) // RPM are all positive, lowest RPM is lowest number
+					value = RPMlist.Min ();
+				else if (RPMlist.Max () <= 0) // RPM are all negative, lowest RPM is highest number
+					value = RPMlist.Max ();
+			}
+
+			return value;
 		}
 
 		public bool IsOnGround()
@@ -177,24 +222,21 @@ namespace Trackar
 			else Debuggar.Error ("Track in FixedUpdate(): WheelDummies is null");
 		}
 
-		public void AdjustSuspensionDamper(float value)
+		public void UpdateSuspension()
 		{
+			SuspConfigContainer suspConfig = Config.WheelDummyConfig.SuspConfig;
 
-		}
+			foreach (WheelDummy wheelDummy in WheelDummies)
+			{
+				JointSpring newSpring = wheelDummy.Collider.suspensionSpring;
+				newSpring.damper = suspConfig.Damper;
+				newSpring.spring = suspConfig.Spring;
+				newSpring.targetPosition = suspConfig.TravelCenter;
 
-		public void AdjustSuspensionSpring(float value)
-		{
+				wheelDummy.Collider.suspensionSpring = newSpring;
 
-		}
-
-		public void AdjustSuspensionHeight(float value)
-		{
-
-		}
-
-		public void AdjustSuspensionTravelMax(float value)
-		{
-
+				wheelDummy.Collider.suspensionDistance = suspConfig.Travel;
+			}
 		}
 	}
 }

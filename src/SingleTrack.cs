@@ -44,15 +44,14 @@ namespace Trackar
 
 			if(HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
+				float torque = 0;
+
 				if (bIsTrackEnabled)
 				{
 					if (TrackInstance != null)
 					{
 						float steer = -2 * this.vessel.ctrlState.wheelSteer;
 						float forward = this.vessel.ctrlState.wheelThrottle;
-
-						float torque = 0;
-
 
 						if (bIsCruiseEnabled && TrackInstance.RPM < CruiseTargetRPM)
 						{
@@ -64,6 +63,8 @@ namespace Trackar
 
 						torque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (TrackInstance.RPM));
 						TrackInstance.Torque = torque;
+
+						ConsumeResource (torque);
 					}
 					else Debuggar.Error ("SingleTrack in FixedUpdate(): TrackInstance is null");
 				}

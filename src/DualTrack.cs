@@ -36,8 +36,6 @@ namespace Trackar
 		public float LeftTrackRPM = 0;
 		[KSPField(guiName = "Right Track RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float RightTrackRPM = 0;
-		[KSPField(guiName = "Revmatch Error", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float RevmatchError = 0;
 
 		[KSPField(guiName = "Left Track Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float LeftTorque = 0;
@@ -75,7 +73,7 @@ namespace Trackar
 					LeftTrackRPM = LeftTrack.RPM;
 					RightTrackRPM = RightTrack.RPM;
 
-					RevmatchError = LeftTrackRPM - RightTrackRPM;
+					//RevmatchError = LeftTrackRPM - RightTrackRPM;
 
 					LeftTorque = 0;
 					RightTorque = 0;
@@ -109,6 +107,8 @@ namespace Trackar
 
 					LeftTrack.Torque = LeftTorque;
 					RightTrack.Torque = RightTorque;
+
+					ConsumeResource (LeftTorque + RightTorque);
 				}
 				else
 				{
