@@ -50,6 +50,11 @@ namespace Trackar
 
 		public bool bIsMirrorInstance = false;
 
+		[KSPField]
+		public float ConsumeResourceRate = 0.25f;
+		[KSPField]
+		public string ConsumedResource = "ElectricCharge";
+
 		public List<Track> Tracks = new List<Track>();
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
@@ -226,6 +231,12 @@ namespace Trackar
 				}
 				else Debuggar.Error("BaseTrackModule in Update(): this.vessel is null FOR WHY SQUAD");
 			}
+		}
+
+		public void ConsumeResource(float torque)
+		{
+			float amount = torque * ConsumeResourceRate;
+			this.part.RequestResource (ConsumedResource, amount);
 		}
 
 		public override void OnLoad (ConfigNode node)

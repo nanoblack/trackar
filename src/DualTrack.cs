@@ -109,6 +109,8 @@ namespace Trackar
 
 					LeftTrack.Torque = LeftTorque;
 					RightTrack.Torque = RightTorque;
+
+					ConsumeResource (LeftTorque + RightTorque);
 				}
 				else
 				{

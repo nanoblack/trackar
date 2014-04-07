@@ -64,6 +64,8 @@ namespace Trackar
 
 						torque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (TrackInstance.RPM));
 						TrackInstance.Torque = torque;
+
+						ConsumeResource (torque);
 					}
 					else Debuggar.Error ("SingleTrack in FixedUpdate(): TrackInstance is null");
 				}
