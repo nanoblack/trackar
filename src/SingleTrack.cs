@@ -44,15 +44,14 @@ namespace Trackar
 
 			if(HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
+				float torque = 0;
+
 				if (bIsTrackEnabled)
 				{
 					if (TrackInstance != null)
 					{
 						float steer = -2 * this.vessel.ctrlState.wheelSteer;
 						float forward = this.vessel.ctrlState.wheelThrottle;
-
-						float torque = 0;
-
 
 						if (bIsCruiseEnabled && TrackInstance.RPM < CruiseTargetRPM)
 						{
