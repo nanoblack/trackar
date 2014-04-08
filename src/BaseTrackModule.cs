@@ -15,12 +15,9 @@ namespace Trackar
 	public class BaseTrackModule : PartModule
 	{
 		public float TrackWidth = 1;
-
 		public float TrackSections = 4;
-
 		[KSPField]
 		public float TrackLength;
-
 		public float TrackThickness = 0.0f;
 
 		[KSPField]
@@ -29,7 +26,6 @@ namespace Trackar
 		public float RollingResistance;
 		[KSPField]
 		public FloatCurve TorqueCurve = new FloatCurve();
-
 
 		[KSPField]
 		public string WheelModelName;
@@ -47,10 +43,6 @@ namespace Trackar
 		[KSPField]
 		public float SuspensionHeight;
 
-		//private bool bAreBrakesEngaged = false;
-
-		protected bool bIsMirrorInstance = false; // TODO: does this serve any useful purpose at the moment?
-
 		[KSPField]
 		public float ConsumeResourceRate = 0.25f;
 		[KSPField]
@@ -64,23 +56,10 @@ namespace Trackar
 		public float CruiseTargetRPM = 0;
 		private KSPActionGroup CruiseActionGroup;
 
-		//[KSPField(guiName = "Suspension Damping", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float dbgSuspensionDamping = 0;
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping") , UI_FloatRange(minValue = 0, maxValue = 15, stepIncrement = 1f)]
 		public float SuspensionDampingAdjustment = 0;
-
-		//[KSPField(guiName = "Suspension Spring", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float dbgSuspensionSpring = 0;
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring") , UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1)]
 		public float SuspensionSpringAdjustment = 0;
-
-		//[KSPField(guiName = "Suspension Target Position", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float dbgSuspensionTargetPos = 0;
-		//[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Target Position Adjust") , UI_FloatRange(minValue = 0, maxValue = 1, stepIncrement = 0.1f)]
-		public float SuspensionTargetPosAdjustment = 0;
-
-		//[KSPField(guiName = "Suspension Travel", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float dbgSuspensionTravel = 0;
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Height") , UI_FloatRange(minValue = 0, maxValue = 2, stepIncrement = 0.1f)]
 		public float SuspensionTravelAdjustment = 0;
 
@@ -118,6 +97,8 @@ namespace Trackar
 			Debuggar.Message ("BaseTrackModule in OnStart(): Module successfully started");
 		}
 
+		// So much for trying to eliminate the track List, still seems useful for brakes and cruise
+		// Perhaps there is another way...
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
 		protected void Brake(KSPActionParam param)
 		{
@@ -169,17 +150,14 @@ namespace Trackar
 			else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list is null");
 		}
 
-		[KSPEvent(guiActive = true, guiName = "Update Suspension")]
+		/*[KSPEvent(guiActive = true, guiName = "Update Suspension")]
 		protected void UpdateSuspension()
 		{
 			if (Tracks != null)
 			{
 				if (Tracks.Count != 0)
 				{
-					TrackConfig.WheelDummyConfig.SuspConfig.Damper = SuspensionDampingAdjustment;
-					TrackConfig.WheelDummyConfig.SuspConfig.Spring = SuspensionSpringAdjustment;
-					TrackConfig.WheelDummyConfig.SuspConfig.TravelCenter = SuspensionTargetPosAdjustment;
-					TrackConfig.WheelDummyConfig.SuspConfig.Travel = SuspensionTravelAdjustment;
+
 
 					foreach (Track track in Tracks)
 						track.UpdateSuspension ();
@@ -187,19 +165,12 @@ namespace Trackar
 				else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list empty");
 			}
 			else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list is null");
-		}
+		}*/
 
 		public virtual void FixedUpdate ()
 		{
-			if (HighLogic.LoadedSceneIsFlight)
+			/*if (HighLogic.LoadedSceneIsFlight)
 			{
-				SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
-
-				dbgSuspensionDamping = suspConfig.Damper;
-				dbgSuspensionSpring = suspConfig.Spring;
-				dbgSuspensionTravel = suspConfig.Travel;
-				dbgSuspensionTargetPos = suspConfig.TravelCenter;
-
 				if (Tracks != null)
 				{
 					if (Tracks.Count != 0)
@@ -212,12 +183,22 @@ namespace Trackar
 					else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list empty");
 				}
 				else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list is null");
+			}*/
+
+			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
+			{
+				if (TrackConfig != null)
+				{
+					TrackConfig.WheelDummyConfig.SuspConfig.Damper = SuspensionDampingAdjustment;
+					TrackConfig.WheelDummyConfig.SuspConfig.Spring = SuspensionSpringAdjustment;
+					TrackConfig.WheelDummyConfig.SuspConfig.Travel = SuspensionTravelAdjustment;
+				}
 			}
 		}
 
 		public virtual void Update ()
 		{
-			if (HighLogic.LoadedSceneIsFlight)
+			/*if (HighLogic.LoadedSceneIsFlight)
 			{
 				if (this.vessel != null)
 				{
@@ -236,7 +217,7 @@ namespace Trackar
 					}
 				}
 				else Debuggar.Error("BaseTrackModule in Update(): this.vessel is null FOR WHY SQUAD");
-			}
+			}*/
 		}
 
 		protected bool ConsumeResource(float torque)

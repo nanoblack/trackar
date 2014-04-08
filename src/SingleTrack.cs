@@ -49,8 +49,8 @@ namespace Trackar
 				 * which means it won't work at all in reality
 				 */
 
-				Vector3 com = this.vessel.findWorldCenterOfMass (); // what's the difference between local CoM and world CoM?
-				Vector3 partPosition = this.part.transform.position; // what's the difference between this and localPosition?
+				Vector3 com = this.vessel.findWorldCenterOfMass ();
+				Vector3 partPosition = this.part.transform.position;
 
 				Debuggar.Message ("SingleTrack in OnStart(): Vessel CoM X = " + com.x.ToString () + " Y = " + com.y.ToString () + " Z = " + com.z.ToString ());
 				Debuggar.Message ("SingleTrack in OnStart(): Part X = " + partPosition.x.ToString () + " Y = " + partPosition.y.ToString () + " Z = " + partPosition.z.ToString ());
@@ -72,6 +72,18 @@ namespace Trackar
 		public override void Update()
 		{
 			base.Update ();
+
+			if (HighLogic.LoadedSceneIsFlight)
+			{
+				if (this.vessel != null)
+				{
+					if (this.vessel.isActiveVessel)
+					{
+						if (TrackInstance != null)
+							TrackInstance.Update ();
+					}
+				}
+			}
 		}
 
 		public override void FixedUpdate ()
@@ -109,6 +121,10 @@ namespace Trackar
 					}
 					TrackRPM = TrackInstance.RPM;
 					DispTorque = torque;
+
+					TrackInstance.UpdateSuspension ();
+
+					TrackInstance.FixedUpdate ();
 				}
 				else Debuggar.Error ("SingleTrack in FixedUpdate(): TrackInstance is null");
 			}

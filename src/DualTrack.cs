@@ -63,9 +63,28 @@ namespace Trackar
 			Debuggar.Message ("DualTrack in OnStart(): module successfully started");
 		}
 
+		public override void Update()
+		{
+			base.Update ();
+
+			if (HighLogic.LoadedSceneIsFlight)
+			{
+				if (this.vessel != null)
+				{
+					if (this.vessel.isActiveVessel)
+					{
+						if (RightTrack != null && LeftTrack != null)
+						{
+							RightTrack.Update ();
+							LeftTrack.Update ();
+						}
+					}
+				}
+			}
+		}
+
 		public override void FixedUpdate ()
 		{
-
 			base.FixedUpdate ();
 
 			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
@@ -78,8 +97,6 @@ namespace Trackar
 
 					LeftTrackRPM = LeftTrack.RPM;
 					RightTrackRPM = RightTrack.RPM;
-
-					//RevmatchError = LeftTrackRPM - RightTrackRPM;
 
 					LeftTorque = 0;
 					RightTorque = 0;
@@ -122,6 +139,12 @@ namespace Trackar
 
 					LeftTrack.Torque = LeftTorque;
 					RightTrack.Torque = RightTorque;
+
+					LeftTrack.UpdateSuspension ();
+					RightTrack.UpdateSuspension ();
+
+					LeftTrack.FixedUpdate ();
+					RightTrack.FixedUpdate ();
 				}
 				else
 				{
