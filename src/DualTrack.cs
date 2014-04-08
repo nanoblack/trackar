@@ -19,32 +19,40 @@ namespace Trackar
 		[KSPField]
 		public string RightTrackRoot = "RightTrackRoot";
 
-		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Left Track Motor"),
+		[KSPField(guiActiveEditor = true, guiActive = true, guiName = "Left Track")]
+		public string LeftTrackContextLabel = ""; // this feels ugly
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Motor"),
 			UI_Toggle(disabledText="Disabled", enabledText="Enabled")]
 		public bool bIsLeftTrackEnabled = true;
-		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Right Track Motor"),
-			UI_Toggle(disabledText="Disabled", enabledText="Enabled")]
-		public bool bIsRightTrackEnabled = true;
-
-		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert Left Track Motor"),
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert"),
 			UI_Toggle(disabledText="No", enabledText="Yes")]
 		public bool bInvertLeftTrack = false;
-		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert Right Track Motor"),
+		[KSPField(guiName = "RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float LeftTrackRPM = 0;
+		[KSPField(guiName = "Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float LeftTorque = 0;
+
+		[KSPField(guiActiveEditor = true, guiActive = true, guiName = "------")]
+		public string ContextSpacer1 = ""; // lol wat
+
+		[KSPField(guiActiveEditor = true, guiActive = true, guiName = "Right Track")]
+		public string RightTrackContextLabel = "";
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Motor"),
+			UI_Toggle(disabledText="Disabled", enabledText="Enabled")]
+		public bool bIsRightTrackEnabled = true;
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert"),
 			UI_Toggle(disabledText="No", enabledText="Yes")]
 		public bool bInvertRightTrack = false;
+		[KSPField(guiName = "RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float RightTrackRPM = 0;
+		[KSPField(guiName = "Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float RightTorque = 0;
+
+		[KSPField(guiActiveEditor = true, guiActive = true, guiName = "------")]
+		public string ContextSpacer2 = ""; // this is getting silly
 
 		private Track LeftTrack;
 		private Track RightTrack;
-
-		[KSPField(guiName = "Left Track RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float LeftTrackRPM = 0;
-		[KSPField(guiName = "Right Track RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float RightTrackRPM = 0;
-
-		[KSPField(guiName = "Left Track Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float LeftTorque = 0;
-		[KSPField(guiName = "Right Track Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float RightTorque = 0;
 
 		public override void OnStart(StartState state)
 		{

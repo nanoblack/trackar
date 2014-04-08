@@ -60,18 +60,18 @@ namespace Trackar
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
 		public bool bIsCruiseEnabled = false;
-		[KSPField(guiName = "Cruise Desired RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		[KSPField(guiName = "Cruise RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float CruiseTargetRPM = 0;
 		private KSPActionGroup CruiseActionGroup;
 
 		//[KSPField(guiName = "Suspension Damping", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionDamping = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping Adjust") , UI_FloatRange(minValue = 0, maxValue = 15, stepIncrement = 1f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping") , UI_FloatRange(minValue = 0, maxValue = 15, stepIncrement = 1f)]
 		public float SuspensionDampingAdjustment = 0;
 
 		//[KSPField(guiName = "Suspension Spring", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionSpring = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring Adjust") , UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring") , UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1)]
 		public float SuspensionSpringAdjustment = 0;
 
 		//[KSPField(guiName = "Suspension Target Position", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
@@ -81,7 +81,7 @@ namespace Trackar
 
 		//[KSPField(guiName = "Suspension Travel", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionTravel = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Travel Adjust") , UI_FloatRange(minValue = 0, maxValue = 2, stepIncrement = 0.1f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Height") , UI_FloatRange(minValue = 0, maxValue = 2, stepIncrement = 0.1f)]
 		public float SuspensionTravelAdjustment = 0;
 
 		protected TrackConfigContainer TrackConfig;
@@ -110,6 +110,11 @@ namespace Trackar
 					CruiseActionGroup = action.actionGroup;
 			}
 			InitBaseTrackModule ();
+
+			SuspensionDampingAdjustment = SuspensionDamper;
+			SuspensionSpringAdjustment = SuspensionSpring;
+			SuspensionTravelAdjustment = SuspensionHeight;
+
 			Debuggar.Message ("BaseTrackModule in OnStart(): Module successfully started");
 		}
 

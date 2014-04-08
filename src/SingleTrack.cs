@@ -16,22 +16,20 @@ namespace Trackar
 	{
 		[KSPField]
 		public string SingleTrackRoot = "TrackRoot";
-		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Track Motor"),
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Motor"),
 			UI_Toggle(disabledText="Disabled", enabledText="Enabled")]
 		public bool bIsTrackEnabled = true;
 
-		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert Track Motor"),
+		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert"),
 			UI_Toggle(disabledText="No", enabledText="Yes")]
 		public bool bInvertTrack = false;
-
-		[KSPField(guiName = "Track RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		[KSPField(guiName = "RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float TrackRPM = 0;
-
 		[KSPField(guiName = "Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float DispTorque = 0;
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Side")]
-		private string SideOfVessel = "left";
+		private string SideOfVessel = "Left";
 
 		private Track TrackInstance;
 
@@ -58,11 +56,11 @@ namespace Trackar
 				Debuggar.Message ("SingleTrack in OnStart(): Part X = " + partPosition.x.ToString () + " Y = " + partPosition.y.ToString () + " Z = " + partPosition.z.ToString ());
 
 				if(partPosition.y > com.y)
-					SideOfVessel = "left";
+					SideOfVessel = "Left";
 				else if(partPosition.y < com.y)
-					SideOfVessel = "right";
+					SideOfVessel = "Right";
 
-				if (SideOfVessel == "right")
+				if (SideOfVessel == "Right")
 					bInvertTrack = true;
 
 				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bInvertTrack);
