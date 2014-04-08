@@ -24,6 +24,13 @@ namespace Trackar
 			UI_Toggle(disabledText="No", enabledText="Yes")]
 		public bool bInvertTrack = true;
 
+		[KSPField(guiName = "Track RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float TrackRPM = 0;
+
+		[KSPField(guiName = "Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		public float DispTorque = 0;
+
+		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Side")]
 		private string SideOfVessel = "left";
 
 		private Track TrackInstance;
@@ -46,6 +53,17 @@ namespace Trackar
 				 * this works perfectly in my head
 				 * which means it won't work at all in reality
 				 */
+
+				Vector3 com = this.vessel.findWorldCenterOfMass (); // what's the difference between local CoM and world CoM?
+				Vector3 partPosition = this.part.transform.position; // what's the difference between this and localPosition?
+
+				Debuggar.Message ("SingleTrack in OnStart(): Vessel CoM X = " + com.x.ToString () + " Y = " + com.y.ToString () + " Z = " + com.z.ToString ());
+				Debuggar.Message ("SingleTrack in OnStart(): Part X = " + partPosition.x.ToString () + " Y = " + partPosition.y.ToString () + " Z = " + partPosition.z.ToString ());
+
+				if(partPosition.y > com.y)
+					SideOfVessel = "left";
+				else if(partPosition.y < com.y)
+					SideOfVessel = "right";
 			}
 			Debuggar.Message ("SingleTrack in OnStart(): Module successfully started");
 		}
@@ -62,10 +80,11 @@ namespace Trackar
 			{
 				float torque = 0;
 
-				if (bIsTrackEnabled)
+				if (TrackInstance != null)
 				{
-					if (TrackInstance != null)
+					if (bIsTrackEnabled)
 					{
+
 						float steer = -2 * this.vessel.ctrlState.wheelSteer;
 						float forward = this.vessel.ctrlState.wheelThrottle;
 
@@ -82,8 +101,10 @@ namespace Trackar
 
 						ConsumeResource (torque);
 					}
-					else Debuggar.Error ("SingleTrack in FixedUpdate(): TrackInstance is null");
+					TrackRPM = TrackInstance.RPM;
+					DispTorque = torque;
 				}
+				else Debuggar.Error ("SingleTrack in FixedUpdate(): TrackInstance is null");
 			}
 			base.FixedUpdate ();
 		}
