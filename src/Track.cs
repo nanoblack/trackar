@@ -1,3 +1,7 @@
+//=============================================================
+// UNSTABLE
+//=============================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,16 +23,16 @@ namespace Trackar
 
 		public bool bApplyBrakes = false;
 
-		public bool bIsMirror = false;
+		private bool bIsMirror = false;
 
-		public GameObject Root;
-		public SkinnedMeshRenderer TrackSurface;
-		public Transform TrackTransform;
-		public Transform TrackSurfaceTransform;
+		private GameObject Root;
+		private SkinnedMeshRenderer TrackSurface;
+		private Transform TrackTransform;
+		private Transform TrackSurfaceTransform;
 
-		public List<WheelDummy> WheelDummies = new List<WheelDummy> ();
+		private List<WheelDummy> WheelDummies = new List<WheelDummy> ();
 
-		public TrackConfigContainer Config;
+		private TrackConfigContainer Config;
 
 		public Track(Transform transform, TrackConfigContainer configContainer, bool mirror)
 		{
@@ -60,7 +64,7 @@ namespace Trackar
 			Debuggar.Message ("Track: Spawned");
 		}
 
-		public void InitWheelDummyList (Component[] components, TrackConfigContainer config)
+		private void InitWheelDummyList (Component[] components, TrackConfigContainer config)
 		{
 			Dictionary<int,GameObject> wheelObjects = new Dictionary<int, GameObject>();
 			Dictionary<int,WheelCollider> wheelColliders = new Dictionary<int, WheelCollider>();
@@ -162,7 +166,8 @@ namespace Trackar
 		{
 			List<float> RPMlist = new List<float> ();
 			float i = 0;
-			float value = 0; // hooray bad variable descriptions
+			float value = RealRPM; // if no colliders on ground, RPMlist will be empty so use last known RPM as a default value
+
 			foreach(WheelDummy wheelDummy in WheelDummies)
 			{
 				if(wheelDummy.Collider.isGrounded)
@@ -174,10 +179,13 @@ namespace Trackar
 
 			if (RPMlist.Count != 0)
 			{
-				if (RPMlist.Min () >= 0) // RPM are all positive, lowest RPM is lowest number
-					value = RPMlist.Min ();
-				else if (RPMlist.Max () <= 0) // RPM are all negative, lowest RPM is highest number
-					value = RPMlist.Max ();
+				if (IsOnGround ())
+				{
+					if (RPMlist.Min () >= 0) // RPM are all positive, lowest RPM is lowest number
+						value = RPMlist.Min ();
+					else if (RPMlist.Max () <= 0) // RPM are all negative, lowest RPM is highest number
+						value = RPMlist.Max ();
+				}
 			}
 
 			return value;

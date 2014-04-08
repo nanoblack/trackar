@@ -1,3 +1,7 @@
+//=============================================================
+// UNSTABLE
+//=============================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,31 +47,31 @@ namespace Trackar
 		[KSPField]
 		public float SuspensionHeight;
 
-		public bool bAreBrakesEngaged = false;
+		//private bool bAreBrakesEngaged = false;
 
-		public bool bIsMirrorInstance = false;
+		protected bool bIsMirrorInstance = false; // TODO: does this serve any useful purpose at the moment?
 
 		[KSPField]
 		public float ConsumeResourceRate = 0.25f;
 		[KSPField]
 		public string ConsumedResource = "ElectricCharge";
 
-		public List<Track> Tracks = new List<Track>();
+		protected List<Track> Tracks = new List<Track>();
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
 		public bool bIsCruiseEnabled = false;
-		[KSPField(guiName = "Cruise Desired RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
+		[KSPField(guiName = "Cruise RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float CruiseTargetRPM = 0;
-		public KSPActionGroup CruiseActionGroup;
+		private KSPActionGroup CruiseActionGroup;
 
 		//[KSPField(guiName = "Suspension Damping", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionDamping = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping Adjust") , UI_FloatRange(minValue = 0, maxValue = 15, stepIncrement = 1f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping") , UI_FloatRange(minValue = 0, maxValue = 15, stepIncrement = 1f)]
 		public float SuspensionDampingAdjustment = 0;
 
 		//[KSPField(guiName = "Suspension Spring", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionSpring = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring Adjust") , UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring") , UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1)]
 		public float SuspensionSpringAdjustment = 0;
 
 		//[KSPField(guiName = "Suspension Target Position", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
@@ -77,12 +81,12 @@ namespace Trackar
 
 		//[KSPField(guiName = "Suspension Travel", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float dbgSuspensionTravel = 0;
-		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Travel Adjust") , UI_FloatRange(minValue = 0, maxValue = 2, stepIncrement = 0.1f)]
+		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Height") , UI_FloatRange(minValue = 0, maxValue = 2, stepIncrement = 0.1f)]
 		public float SuspensionTravelAdjustment = 0;
 
-		public TrackConfigContainer TrackConfig;
+		protected TrackConfigContainer TrackConfig;
 
-		public void InitBaseTrackModule()
+		protected void InitBaseTrackModule()
 		{
 			SuspConfigContainer SuspConfig = new SuspConfigContainer (SuspensionHeight, 0, SuspensionDamper, SuspensionSpring);
 
@@ -106,11 +110,16 @@ namespace Trackar
 					CruiseActionGroup = action.actionGroup;
 			}
 			InitBaseTrackModule ();
+
+			SuspensionDampingAdjustment = SuspensionDamper;
+			SuspensionSpringAdjustment = SuspensionSpring;
+			SuspensionTravelAdjustment = SuspensionHeight;
+
 			Debuggar.Message ("BaseTrackModule in OnStart(): Module successfully started");
 		}
 
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
-		public void Brake(KSPActionParam param)
+		protected void Brake(KSPActionParam param)
 		{
 			if (Tracks != null)
 			{
@@ -137,7 +146,7 @@ namespace Trackar
 		}
 
 		[KSPAction("Toggle Cruise Control", KSPActionGroup.None)]
-		public void ToggleCruiseControl(KSPActionParam param)
+		protected void ToggleCruiseControl(KSPActionParam param)
 		{
 			if (Tracks != null)
 			{
@@ -161,7 +170,7 @@ namespace Trackar
 		}
 
 		[KSPEvent(guiActive = true, guiName = "Update Suspension")]
-		public void UpdateSuspension()
+		protected void UpdateSuspension()
 		{
 			if (Tracks != null)
 			{
@@ -230,10 +239,12 @@ namespace Trackar
 			}
 		}
 
-		public void ConsumeResource(float torque)
+		protected bool ConsumeResource(float torque)
 		{
-			float amount = Mathf.Abs (torque * ConsumeResourceRate);
-			this.part.RequestResource (ConsumedResource, amount);
+			float amountToConsume = Mathf.Abs (torque * ConsumeResourceRate);
+			float amountConsumed = this.part.RequestResource (ConsumedResource, amountToConsume);
+
+			return (amountConsumed >= amountToConsume);
 		}
 
 		public override void OnLoad (ConfigNode node)
