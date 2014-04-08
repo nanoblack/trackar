@@ -22,7 +22,7 @@ namespace Trackar
 
 		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Invert Track Motor"),
 			UI_Toggle(disabledText="No", enabledText="Yes")]
-		public bool bInvertTrack = true;
+		public bool bInvertTrack = false;
 
 		[KSPField(guiName = "Track RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float TrackRPM = 0;
@@ -64,6 +64,9 @@ namespace Trackar
 					SideOfVessel = "left";
 				else if(partPosition.y < com.y)
 					SideOfVessel = "right";
+
+				if (SideOfVessel == "right")
+					bInvertTrack = true;
 			}
 			Debuggar.Message ("SingleTrack in OnStart(): Module successfully started");
 		}
