@@ -1,3 +1,7 @@
+//=============================================================
+// UNSTABLE
+//=============================================================
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +33,8 @@ namespace Trackar
 			UI_Toggle(disabledText="No", enabledText="Yes")]
 		public bool bInvertRightTrack = false;
 
-		public Track LeftTrack;
-		public Track RightTrack;
+		private Track LeftTrack;
+		private Track RightTrack;
 
 		[KSPField(guiName = "Left Track RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float LeftTrackRPM = 0;
