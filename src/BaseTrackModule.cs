@@ -239,10 +239,12 @@ namespace Trackar
 			}
 		}
 
-		protected void ConsumeResource(float torque)
+		protected bool ConsumeResource(float torque)
 		{
-			float amount = Mathf.Abs (torque * ConsumeResourceRate);
-			this.part.RequestResource (ConsumedResource, amount);
+			float amountToConsume = Mathf.Abs (torque * ConsumeResourceRate);
+			float amountConsumed = this.part.RequestResource (ConsumedResource, amountToConsume);
+
+			return (amountConsumed >= amountToConsume);
 		}
 
 		public override void OnLoad (ConfigNode node)

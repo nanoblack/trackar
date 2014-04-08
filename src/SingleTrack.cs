@@ -98,9 +98,14 @@ namespace Trackar
 							forward *= -1;
 
 						torque = (Mathf.Clamp (forward + steer, -1, 1) * TorqueCurve.Evaluate (TrackInstance.RPM));
+
+						bool bIsResourceAvailable = ConsumeResource (torque);
+
+						if (!bIsResourceAvailable)
+							torque = 0;
+						
 						TrackInstance.Torque = torque;
 
-						ConsumeResource (torque);
 					}
 					TrackRPM = TrackInstance.RPM;
 					DispTorque = torque;

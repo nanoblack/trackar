@@ -117,10 +117,17 @@ namespace Trackar
 					else if ((RightTrackRPM > LeftTrackRPM && LeftTrackRPM >= 100) && steer == 0)
 						RightTorque -= RightTorque * (Mathf.Clamp(RightTrackRPM - LeftTrackRPM, 0, 1));
 
+
+					bool bIsResourceAvailable = ConsumeResource (LeftTorque + RightTorque);
+
+					if (!bIsResourceAvailable)
+					{
+						LeftTorque = 0;
+						RightTorque = 0;
+					}
+
 					LeftTrack.Torque = LeftTorque;
 					RightTrack.Torque = RightTorque;
-
-					ConsumeResource (LeftTorque + RightTorque);
 				}
 				else
 				{
