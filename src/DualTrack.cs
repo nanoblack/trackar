@@ -32,9 +32,6 @@ namespace Trackar
 		[KSPField(guiName = "Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float LeftTorque = 0;
 
-		[KSPField(guiActiveEditor = true, guiActive = true, guiName = "------")]
-		public string ContextSpacer1 = ""; // lol wat
-
 		[KSPField(guiActiveEditor = true, guiActive = true, guiName = "Right Track")]
 		public string RightTrackContextLabel = "";
 		[KSPField(isPersistant = true, guiActive = true, guiActiveEditor = true, guiName = "Motor"),
@@ -47,9 +44,6 @@ namespace Trackar
 		public float RightTrackRPM = 0;
 		[KSPField(guiName = "Torque", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float RightTorque = 0;
-
-		[KSPField(guiActiveEditor = true, guiActive = true, guiName = "------")]
-		public string ContextSpacer2 = ""; // this is getting silly
 
 		private Track LeftTrack;
 		private Track RightTrack;
