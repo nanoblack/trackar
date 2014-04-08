@@ -14,6 +14,13 @@ namespace Trackar
 
 		public SuspConfigContainer Susp;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.WheelDummy"/> class.
+		/// </summary>
+		/// <param name="col">Col.</param>
+		/// <param name="joint">Joint.</param>
+		/// <param name="model">Model.</param>
+		/// <param name="config">WheelDummyConfigContainer.</param>
 		public WheelDummy(WheelCollider col, Transform joint, GameObject model, WheelDummyConfigContainer config)
 		{
 			if (col == null)
@@ -49,6 +56,10 @@ namespace Trackar
 			Debuggar.Message ("WheelDummy: Spawned");
 		}
 
+		/// <summary>
+		/// Rotate wheel model for the specified rpm.
+		/// </summary>
+		/// <param name="rpm">RPM.</param>
 		public void Rotate(float rpm)
 		{
 			float deg = (rpm / 60) * 360;

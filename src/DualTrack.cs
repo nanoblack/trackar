@@ -88,7 +88,7 @@ namespace Trackar
 			{
 				if (LeftTrack != null && RightTrack != null)
 				{
-					float steer = 2 * this.vessel.ctrlState.wheelSteer;
+					float steer = 2 * this.vessel.ctrlState.wheelSteer; // I'm not sure this should be * 2 here anymore
 					float leftForward = this.vessel.ctrlState.wheelThrottle;
 					float rightForward = this.vessel.ctrlState.wheelThrottle;
 

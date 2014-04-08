@@ -34,6 +34,12 @@ namespace Trackar
 
 		private TrackConfigContainer Config;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.Track"/> class.
+		/// </summary>
+		/// <param name="transform">Track Transform.</param>
+		/// <param name="configContainer">TrackConfigContainer.</param>
+		/// <param name="mirror">If set to <c>true</c> mirror.</param>
 		public Track(Transform transform, TrackConfigContainer configContainer, bool mirror)
 		{
 			Config = configContainer;
@@ -64,6 +70,11 @@ namespace Trackar
 			Debuggar.Message ("Track: Spawned");
 		}
 
+		/// <summary>
+		/// Inits the wheel dummy list.
+		/// </summary>
+		/// <param name="components">Component array to iterate.</param>
+		/// <param name="config">TrackConfigContainer.</param>
 		private void InitWheelDummyList (Component[] components, TrackConfigContainer config)
 		{
 			Dictionary<int,GameObject> wheelObjects = new Dictionary<int, GameObject>();
@@ -120,6 +131,9 @@ namespace Trackar
 			else Debuggar.Error ("Track in InitWheelDummyList(): Received null components");
 		}
 
+		/// <summary>
+		/// Update this instance.
+		/// </summary>
 		public void Update()
 		{
 			if (WheelDummies != null)
@@ -149,7 +163,10 @@ namespace Trackar
 			else Debuggar.Error ("Track in Update(): WheelDummies is null");
 		}
 
-		// this needs to get the lowest grounded wheel RPM
+		/// <summary>
+		/// Gets the track RPM.
+		/// </summary>
+		/// <returns>The track RPM.</returns>
 		public float GetTrackRPM()
 		{
 			List<float> RPMlist = new List<float> ();
@@ -179,6 +196,11 @@ namespace Trackar
 			return value;
 		}
 
+		// neat
+		/// <summary>
+		/// Determines whether this instance is on ground.
+		/// </summary>
+		/// <returns><c>true</c> if this instance is on ground; otherwise, <c>false</c>.</returns>
 		public bool IsOnGround()
 		{
 			if (WheelDummies.Count != 0)
@@ -197,6 +219,10 @@ namespace Trackar
 			}
 		}
 
+		// lol wat
+		/// <summary>
+		/// Fixeds the update.
+		/// </summary>
 		public void FixedUpdate ()
 		{
 			if (WheelDummies != null)
@@ -218,6 +244,9 @@ namespace Trackar
 			else Debuggar.Error ("Track in FixedUpdate(): WheelDummies is null");
 		}
 
+		/// <summary>
+		/// Updates the suspension.
+		/// </summary>
 		public void UpdateSuspension()
 		{
 			SuspConfigContainer suspConfig = Config.WheelDummyConfig.SuspConfig;

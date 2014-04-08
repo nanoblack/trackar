@@ -28,13 +28,13 @@ namespace Trackar
 		public FloatCurve TorqueCurve = new FloatCurve();
 
 		[KSPField]
-		public string WheelModelName;
+		protected string WheelModelName;
 		[KSPField]
-		public string WheelColliderName;
+		protected string WheelColliderName;
 		[KSPField]
-		public string TrackSurfaceName;
+		protected string TrackSurfaceName;
 		[KSPField]
-		public string SuspJointName;
+		protected string SuspJointName;
 
 		[KSPField]
 		public float SuspensionDamper;
@@ -49,7 +49,7 @@ namespace Trackar
 		public string ConsumedResource = "ElectricCharge";
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
-		public bool bIsCruiseEnabled = false;
+		protected bool bIsCruiseEnabled = false;
 		[KSPField(guiName = "Cruise RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float CruiseTargetRPM = 0;
 		private KSPActionGroup CruiseActionGroup;
@@ -66,16 +66,6 @@ namespace Trackar
 
 		protected TrackConfigContainer TrackConfig;
 
-		protected void InitBaseTrackModule()
-		{
-			SuspConfigContainer SuspConfig = new SuspConfigContainer (SuspensionHeight, 0, SuspensionDamper, SuspensionSpring);
-
-			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
-			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
-
-			TrackConfig = new TrackConfigContainer (TrackWidth, TrackLength, ModelConfig, WheelDummyConfig);
-		}
-
 		public override void OnStart(StartState state)
 		{
 			foreach (Transform tempCol in part.FindModelTransforms("sideCollider"))
@@ -89,7 +79,12 @@ namespace Trackar
 				if (action.guiName.ToString () == "Toggle Cruise Control")
 					CruiseActionGroup = action.actionGroup;
 			}
-			InitBaseTrackModule ();
+
+			SuspConfigContainer SuspConfig = new SuspConfigContainer (SuspensionHeight, 0, SuspensionDamper, SuspensionSpring);
+			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
+			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
+
+			TrackConfig = new TrackConfigContainer (TrackWidth, TrackLength, ModelConfig, WheelDummyConfig);
 
 			SuspensionDampingAdjustment = SuspensionDamper;
 			SuspensionSpringAdjustment = SuspensionSpring;
@@ -146,6 +141,14 @@ namespace Trackar
 		{
 		}
 
+		// wow I typed three slashes and monodevelop pulled this out of its ass
+		// IT KNOWS
+		// but really that's kind of neat it was able to autocomplete it as accurate as it did
+		/// <summary>
+		/// Consumes the resource.
+		/// </summary>
+		/// <returns><c>true</c>, if resource was consumed, <c>false</c> otherwise.</returns>
+		/// <param name="torque">Torque.</param>
 		protected bool ConsumeResource(float torque)
 		{
 			float amountToConsume = Mathf.Abs (torque * ConsumeResourceRate);
