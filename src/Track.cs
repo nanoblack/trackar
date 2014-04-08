@@ -126,18 +126,6 @@ namespace Trackar
 			{
 				if (WheelDummies.Count != 0)
 				{
-					/*if (IsOnGround ()) // this whole spot is causing problems
-					{
-						foreach (WheelDummy wheelDummy in WheelDummies)
-						{
-							RealRPM = wheelDummy.Collider.rpm * wheelDummy.Collider.radius;
-							RPM = Mathf.Abs (RealRPM);
-							if (bIsMirror)
-								wheelDummy.Rotate (-RealRPM);
-							else
-								wheelDummy.Rotate (RealRPM);
-						}
-					}*/
 					RealRPM = GetTrackRPM ();
 					RPM = Mathf.Abs (RealRPM);
 					foreach(WheelDummy wheelDummy in WheelDummies)

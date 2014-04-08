@@ -55,10 +55,7 @@ namespace Trackar
 			if (HighLogic.LoadedSceneIsFlight)
 			{
 				LeftTrack = new Track (part.FindModelTransform (LeftTrackRoot), TrackConfig, false);
-				//Tracks.Add (LeftTrack); // can this List be done away with yet? ugh
-
 				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, true);
-				//Tracks.Add (RightTrack);
 			}
 			Debuggar.Message ("DualTrack in OnStart(): module successfully started");
 		}

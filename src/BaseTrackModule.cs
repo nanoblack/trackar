@@ -48,8 +48,6 @@ namespace Trackar
 		[KSPField]
 		public string ConsumedResource = "ElectricCharge";
 
-		//protected List<Track> Tracks = new List<Track>();
-
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
 		public bool bIsCruiseEnabled = false;
 		[KSPField(guiName = "Cruise RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]

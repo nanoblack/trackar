@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Trackar
 {
-	public partial class SingleTrack : BaseTrackModule
+	public class SingleTrack : BaseTrackModule
 	{
 		[KSPField]
 		public string SingleTrackRoot = "TrackRoot";
@@ -49,6 +49,8 @@ namespace Trackar
 				 * which means it won't work at all in reality
 				 */
 
+				// ^^ turns out just the left/right detection might be all it needs? it cannot be that simple. but it's working.
+
 				Vector3 com = this.vessel.findWorldCenterOfMass ();
 				Vector3 partPosition = this.part.transform.position;
 
@@ -64,7 +66,6 @@ namespace Trackar
 					bInvertTrack = true;
 
 				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bInvertTrack);
-				//Tracks.Add (TrackInstance);
 			}
 			Debuggar.Message ("SingleTrack in OnStart(): Module successfully started");
 		}
