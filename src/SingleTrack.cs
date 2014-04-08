@@ -41,9 +41,6 @@ namespace Trackar
 
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bIsMirrorInstance);
-				Tracks.Add (TrackInstance);
-
 				/* TODO
 				 * get vessel CoM
 				 * compare to this part's coords to determine which side of the vessel it's on
@@ -67,6 +64,9 @@ namespace Trackar
 
 				if (SideOfVessel == "right")
 					bInvertTrack = true;
+
+				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bInvertTrack);
+				Tracks.Add (TrackInstance);
 			}
 			Debuggar.Message ("SingleTrack in OnStart(): Module successfully started");
 		}
