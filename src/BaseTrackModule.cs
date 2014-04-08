@@ -48,13 +48,16 @@ namespace Trackar
 		[KSPField]
 		public string ConsumedResource = "ElectricCharge";
 
-		protected List<Track> Tracks = new List<Track>();
+		//protected List<Track> Tracks = new List<Track>();
 
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
 		public bool bIsCruiseEnabled = false;
 		[KSPField(guiName = "Cruise RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float CruiseTargetRPM = 0;
 		private KSPActionGroup CruiseActionGroup;
+		protected float CruiseMonitorRPM = 0;
+
+		protected bool bApplyBrakes = false;
 
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping") , UI_FloatRange(minValue = 0, maxValue = 15, stepIncrement = 1f)]
 		public float SuspensionDampingAdjustment = 0;
@@ -97,94 +100,39 @@ namespace Trackar
 			Debuggar.Message ("BaseTrackModule in OnStart(): Module successfully started");
 		}
 
-		// So much for trying to eliminate the track List, still seems useful for brakes and cruise
-		// Perhaps there is another way...
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
 		protected void Brake(KSPActionParam param)
 		{
-			if (Tracks != null)
+			if (param.type == KSPActionType.Activate)
 			{
-				if (Tracks.Count != 0)
-				{
-					if (param.type == KSPActionType.Activate)
-					{
-						if (bIsCruiseEnabled)
-						{
-							this.vessel.ActionGroups.ToggleGroup (CruiseActionGroup);
-						}
+				if (bIsCruiseEnabled)
+					this.vessel.ActionGroups.ToggleGroup (CruiseActionGroup);
 
-						foreach (Track track in Tracks)
-							track.bApplyBrakes = true;
-					} else
-					{
-						foreach (Track track in Tracks)
-							track.bApplyBrakes = false;
-					}
-				}
-				else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list empty");
+				bApplyBrakes = true;
 			}
-			else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list is null");
+			else
+			{
+				bApplyBrakes = false;
+			}
 		}
 
 		[KSPAction("Toggle Cruise Control", KSPActionGroup.None)]
 		protected void ToggleCruiseControl(KSPActionParam param)
 		{
-			if (Tracks != null)
+			if (param.type == KSPActionType.Activate)
 			{
-				if (Tracks.Count != 0)
-				{
-					if (param.type == KSPActionType.Activate)
-					{
-						bIsCruiseEnabled = true;
-						foreach (Track track in Tracks)
-							if (CruiseTargetRPM < track.RPM)
-								CruiseTargetRPM = track.RPM;
-					} else
-					{
-						bIsCruiseEnabled = false;
-						CruiseTargetRPM = 0;
-					}
-				}
-				else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list empty");
+				bIsCruiseEnabled = true;
+				CruiseTargetRPM = CruiseMonitorRPM;
 			}
-			else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list is null");
+			else
+			{
+				bIsCruiseEnabled = false;
+				CruiseTargetRPM = 0;
+			}
 		}
-
-		/*[KSPEvent(guiActive = true, guiName = "Update Suspension")]
-		protected void UpdateSuspension()
-		{
-			if (Tracks != null)
-			{
-				if (Tracks.Count != 0)
-				{
-
-
-					foreach (Track track in Tracks)
-						track.UpdateSuspension ();
-				}
-				else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list empty");
-			}
-			else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list is null");
-		}*/
 
 		public virtual void FixedUpdate ()
 		{
-			/*if (HighLogic.LoadedSceneIsFlight)
-			{
-				if (Tracks != null)
-				{
-					if (Tracks.Count != 0)
-					{
-						foreach (Track track in Tracks)
-						{
-							track.FixedUpdate ();
-						}
-					}
-					else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list empty");
-				}
-				else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list is null");
-			}*/
-
 			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
 				if (TrackConfig != null)
@@ -198,26 +146,6 @@ namespace Trackar
 
 		public virtual void Update ()
 		{
-			/*if (HighLogic.LoadedSceneIsFlight)
-			{
-				if (this.vessel != null)
-				{
-					if (this.vessel.isActiveVessel)
-					{
-						if (Tracks != null)
-						{
-							if (Tracks.Count != 0)
-							{
-								foreach (Track track in Tracks)
-									track.Update ();
-							} else
-								Debuggar.Error ("BaseTrackModule in Update(): Tracks list empty");
-						} else
-							Debuggar.Error ("BaseTrackModule in Update(): Tracks list is null");
-					}
-				}
-				else Debuggar.Error("BaseTrackModule in Update(): this.vessel is null FOR WHY SQUAD");
-			}*/
 		}
 
 		protected bool ConsumeResource(float torque)

@@ -64,7 +64,7 @@ namespace Trackar
 					bInvertTrack = true;
 
 				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bInvertTrack);
-				Tracks.Add (TrackInstance);
+				//Tracks.Add (TrackInstance);
 			}
 			Debuggar.Message ("SingleTrack in OnStart(): Module successfully started");
 		}
@@ -124,7 +124,11 @@ namespace Trackar
 
 					TrackInstance.UpdateSuspension ();
 
+					TrackInstance.bApplyBrakes = bApplyBrakes;
+
 					TrackInstance.FixedUpdate ();
+
+					CruiseMonitorRPM = TrackRPM;
 				}
 				else Debuggar.Error ("SingleTrack in FixedUpdate(): TrackInstance is null");
 			}

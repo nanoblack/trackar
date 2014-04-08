@@ -55,10 +55,10 @@ namespace Trackar
 			if (HighLogic.LoadedSceneIsFlight)
 			{
 				LeftTrack = new Track (part.FindModelTransform (LeftTrackRoot), TrackConfig, false);
-				Tracks.Add (LeftTrack); // can this List be done away with yet? ugh
+				//Tracks.Add (LeftTrack); // can this List be done away with yet? ugh
 
 				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, true);
-				Tracks.Add (RightTrack);
+				//Tracks.Add (RightTrack);
 			}
 			Debuggar.Message ("DualTrack in OnStart(): module successfully started");
 		}
@@ -143,8 +143,16 @@ namespace Trackar
 					LeftTrack.UpdateSuspension ();
 					RightTrack.UpdateSuspension ();
 
+					LeftTrack.bApplyBrakes = bApplyBrakes;
+					RightTrack.bApplyBrakes = bApplyBrakes;
+
 					LeftTrack.FixedUpdate ();
 					RightTrack.FixedUpdate ();
+
+					if (RightTrackRPM >= LeftTrackRPM)
+						CruiseMonitorRPM = RightTrackRPM;
+					else
+						CruiseMonitorRPM = LeftTrackRPM;
 				}
 				else
 				{
