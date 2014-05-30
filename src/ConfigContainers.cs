@@ -10,11 +10,21 @@ namespace Trackar
 		public float Spring = 0;
 		public float Damper = 0;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.SuspConfigContainer"/> class.
+		/// </summary>
 		public SuspConfigContainer()
 		{
 			Debuggar.Message ("SuspConfigContainer: Spawned empty");
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.SuspConfigContainer"/> class.
+		/// </summary>
+		/// <param name="travel">Travel.</param>
+		/// <param name="travelCenter">Travel center.</param>
+		/// <param name="damper">Damper.</param>
+		/// <param name="spring">Spring.</param>
 		public SuspConfigContainer(float travel, float travelCenter, float damper, float spring)
 		{
 			Travel = travel;
@@ -33,12 +43,20 @@ namespace Trackar
 
 		public SuspConfigContainer SuspConfig;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.WheelDummyConfigContainer"/> class.
+		/// </summary>
 		public WheelDummyConfigContainer()
 		{
 			SuspConfig = new SuspConfigContainer ();
 			Debuggar.Message ("WheelDummyConfigContainer: Spawned empty");
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.WheelDummyConfigContainer"/> class.
+		/// </summary>
+		/// <param name="brakingTorque">Braking torque.</param>
+		/// <param name="rollingResistance">Rolling resistance.</param>
 		public WheelDummyConfigContainer(float brakingTorque, float rollingResistance)
 		{
 			BrakingTorque = brakingTorque;
@@ -48,6 +66,12 @@ namespace Trackar
 			Debuggar.Message ("WheelDummyConfigContainer: Spawned with BrakingTorque = " + BrakingTorque.ToString () + " RollingResistance = " + RollingResistance.ToString ());
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.WheelDummyConfigContainer"/> class.
+		/// </summary>
+		/// <param name="brakingTorque">Braking torque.</param>
+		/// <param name="rollingResistance">Rolling resistance.</param>
+		/// <param name="suspConfig">SuspConfigContainer.</param>
 		public WheelDummyConfigContainer(float brakingTorque, float rollingResistance, SuspConfigContainer suspConfig)
 		{
 			BrakingTorque = brakingTorque;
@@ -69,11 +93,21 @@ namespace Trackar
 		public string TrackSurface = "TrackSurface";
 		public string Joint = "joint";
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.ModelConfigContainer"/> class.
+		/// </summary>
 		public ModelConfigContainer()
 		{
 			Debuggar.Message ("ModelConfigContainer: Spawned with defaults");
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.ModelConfigContainer"/> class.
+		/// </summary>
+		/// <param name="wheelCollider">Wheel collider.</param>
+		/// <param name="wheelModel">Wheel model.</param>
+		/// <param name="trackSurface">Track surface.</param>
+		/// <param name="joint">Joint.</param>
 		public ModelConfigContainer(string wheelCollider, string wheelModel, string trackSurface, string joint)
 		{
 			if(wheelCollider != null && wheelCollider != "")
@@ -101,6 +135,9 @@ namespace Trackar
 
 		public WheelDummyConfigContainer WheelDummyConfig;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.TrackConfigContainer"/> class.
+		/// </summary>
 		public TrackConfigContainer()
 		{
 			ModelConfig = new ModelConfigContainer ();
@@ -108,6 +145,11 @@ namespace Trackar
 			Debuggar.Message ("TrackConfigContainer: Spawned empty");
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.TrackConfigContainer"/> class.
+		/// </summary>
+		/// <param name="width">Width.</param>
+		/// <param name="length">Length.</param>
 		public TrackConfigContainer(float width, float length)
 		{
 			Width = width;
@@ -118,6 +160,13 @@ namespace Trackar
 			Debuggar.Message ("TrackConfigContainer: Spawned with Width = " + Width.ToString () + " Length = " + Length.ToString ());
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Trackar.TrackConfigContainer"/> class.
+		/// </summary>
+		/// <param name="width">Width.</param>
+		/// <param name="length">Length.</param>
+		/// <param name="modelConfig">ModelConfigContaner.</param>
+		/// <param name="wheelDummyConfig">WheelDummyConfigContainer.</param>
 		public TrackConfigContainer(float width, float length, ModelConfigContainer modelConfig, WheelDummyConfigContainer wheelDummyConfig)
 		{
 			Width = width;

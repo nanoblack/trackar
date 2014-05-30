@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Trackar
 {
-	public partial class SingleTrack : BaseTrackModule
+	public class SingleTrack : BaseTrackModule
 	{
 		[KSPField]
 		public string SingleTrackRoot = "TrackRoot";
@@ -39,39 +39,51 @@ namespace Trackar
 
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				/* TODO
-				 * get vessel CoM
-				 * compare to this part's coords to determine which side of the vessel it's on
-				 * get this part's "forward" vector to determine whether it's facing "forward" or "backward"
-				 * set bInvertTrack accordingly
-				 * 
-				 * this works perfectly in my head
-				 * which means it won't work at all in reality
-				 */
+				CheckSide ();
 
-				Vector3 com = this.vessel.findWorldCenterOfMass (); // what's the difference between local CoM and world CoM?
-				Vector3 partPosition = this.part.transform.position; // what's the difference between this and localPosition?
+				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bInvertTrack);
+			}
+			Debuggar.Message ("SingleTrack in OnStart(): Module successfully started");
+		}
+
+		/// <summary>
+		/// Find side of vessel this module's part is on and set SideOfVessel and bInvertTrack if necessary.
+		/// </summary>
+		private void CheckSide()
+		{
+			if (this.vessel != null && this.part != null)
+			{
+				Vector3 com = this.vessel.findWorldCenterOfMass ();
+				Vector3 partPosition = this.part.transform.position;
 
 				Debuggar.Message ("SingleTrack in OnStart(): Vessel CoM X = " + com.x.ToString () + " Y = " + com.y.ToString () + " Z = " + com.z.ToString ());
 				Debuggar.Message ("SingleTrack in OnStart(): Part X = " + partPosition.x.ToString () + " Y = " + partPosition.y.ToString () + " Z = " + partPosition.z.ToString ());
 
-				if(partPosition.y > com.y)
+				if (partPosition.y > com.y)
 					SideOfVessel = "Left";
-				else if(partPosition.y < com.y)
+				else if (partPosition.y < com.y)
 					SideOfVessel = "Right";
 
 				if (SideOfVessel == "Right")
 					bInvertTrack = true;
-
-				TrackInstance = new Track (part.FindModelTransform (SingleTrackRoot), TrackConfig, bInvertTrack);
-				Tracks.Add (TrackInstance);
 			}
-			Debuggar.Message ("SingleTrack in OnStart(): Module successfully started");
 		}
 
 		public override void Update()
 		{
 			base.Update ();
+
+			if (HighLogic.LoadedSceneIsFlight)
+			{
+				if (this.vessel != null)
+				{
+					if (this.vessel.isActiveVessel)
+					{
+						if (TrackInstance != null)
+							TrackInstance.Update ();
+					}
+				}
+			}
 		}
 
 		public override void FixedUpdate ()
@@ -109,6 +121,14 @@ namespace Trackar
 					}
 					TrackRPM = TrackInstance.RPM;
 					DispTorque = torque;
+
+					TrackInstance.UpdateSuspension ();
+
+					TrackInstance.bApplyBrakes = bApplyBrakes;
+
+					TrackInstance.FixedUpdate ();
+
+					CruiseMonitorRPM = TrackRPM;
 				}
 				else Debuggar.Error ("SingleTrack in FixedUpdate(): TrackInstance is null");
 			}

@@ -15,12 +15,9 @@ namespace Trackar
 	public class BaseTrackModule : PartModule
 	{
 		public float TrackWidth = 1;
-
 		public float TrackSections = 4;
-
 		[KSPField]
 		public float TrackLength;
-
 		public float TrackThickness = 0.0f;
 
 		[KSPField]
@@ -30,15 +27,14 @@ namespace Trackar
 		[KSPField]
 		public FloatCurve TorqueCurve = new FloatCurve();
 
-
 		[KSPField]
-		public string WheelModelName;
+		protected string WheelModelName;
 		[KSPField]
-		public string WheelColliderName;
+		protected string WheelColliderName;
 		[KSPField]
-		public string TrackSurfaceName;
+		protected string TrackSurfaceName;
 		[KSPField]
-		public string SuspJointName;
+		protected string SuspJointName;
 
 		[KSPField]
 		public float SuspensionDamper;
@@ -47,54 +43,28 @@ namespace Trackar
 		[KSPField]
 		public float SuspensionHeight;
 
-		//private bool bAreBrakesEngaged = false;
-
-		protected bool bIsMirrorInstance = false; // TODO: does this serve any useful purpose at the moment?
-
 		[KSPField]
 		public float ConsumeResourceRate = 0.25f;
 		[KSPField]
 		public string ConsumedResource = "ElectricCharge";
 
-		protected List<Track> Tracks = new List<Track>();
-
 		[KSPField(guiActive = Debuggar.bIsDebugMode, guiName = "Cruise Mode")]
-		public bool bIsCruiseEnabled = false;
+		protected bool bIsCruiseEnabled = false;
 		[KSPField(guiName = "Cruise RPM", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
 		public float CruiseTargetRPM = 0;
 		private KSPActionGroup CruiseActionGroup;
+		protected float CruiseMonitorRPM = 0;
 
-		//[KSPField(guiName = "Suspension Damping", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float dbgSuspensionDamping = 0;
+		protected bool bApplyBrakes = false;
+
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Damping") , UI_FloatRange(minValue = 0, maxValue = 15, stepIncrement = 1f)]
 		public float SuspensionDampingAdjustment = 0;
-
-		//[KSPField(guiName = "Suspension Spring", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float dbgSuspensionSpring = 0;
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Spring") , UI_FloatRange(minValue = 0, maxValue = 100, stepIncrement = 1)]
 		public float SuspensionSpringAdjustment = 0;
-
-		//[KSPField(guiName = "Suspension Target Position", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float dbgSuspensionTargetPos = 0;
-		//[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Target Position Adjust") , UI_FloatRange(minValue = 0, maxValue = 1, stepIncrement = 0.1f)]
-		public float SuspensionTargetPosAdjustment = 0;
-
-		//[KSPField(guiName = "Suspension Travel", guiFormat = "F1", guiActive = Debuggar.bIsDebugMode)]
-		public float dbgSuspensionTravel = 0;
 		[KSPField(guiActive = true, guiActiveEditor = true, guiName = "Height") , UI_FloatRange(minValue = 0, maxValue = 2, stepIncrement = 0.1f)]
 		public float SuspensionTravelAdjustment = 0;
 
 		protected TrackConfigContainer TrackConfig;
-
-		protected void InitBaseTrackModule()
-		{
-			SuspConfigContainer SuspConfig = new SuspConfigContainer (SuspensionHeight, 0, SuspensionDamper, SuspensionSpring);
-
-			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
-			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
-
-			TrackConfig = new TrackConfigContainer (TrackWidth, TrackLength, ModelConfig, WheelDummyConfig);
-		}
 
 		public override void OnStart(StartState state)
 		{
@@ -109,7 +79,12 @@ namespace Trackar
 				if (action.guiName.ToString () == "Toggle Cruise Control")
 					CruiseActionGroup = action.actionGroup;
 			}
-			InitBaseTrackModule ();
+
+			SuspConfigContainer SuspConfig = new SuspConfigContainer (SuspensionHeight, 0, SuspensionDamper, SuspensionSpring);
+			WheelDummyConfigContainer WheelDummyConfig = new WheelDummyConfigContainer (BrakingTorque, RollingResistance, SuspConfig);
+			ModelConfigContainer ModelConfig = new ModelConfigContainer (WheelColliderName, WheelModelName, TrackSurfaceName, SuspJointName);
+
+			TrackConfig = new TrackConfigContainer (TrackWidth, TrackLength, ModelConfig, WheelDummyConfig);
 
 			SuspensionDampingAdjustment = SuspensionDamper;
 			SuspensionSpringAdjustment = SuspensionSpring;
@@ -121,124 +96,59 @@ namespace Trackar
 		[KSPAction("Brakes", KSPActionGroup.Brakes)]
 		protected void Brake(KSPActionParam param)
 		{
-			if (Tracks != null)
+			if (param.type == KSPActionType.Activate)
 			{
-				if (Tracks.Count != 0)
-				{
-					if (param.type == KSPActionType.Activate)
-					{
-						if (bIsCruiseEnabled)
-						{
-							this.vessel.ActionGroups.ToggleGroup (CruiseActionGroup);
-						}
+				if (bIsCruiseEnabled)
+					this.vessel.ActionGroups.ToggleGroup (CruiseActionGroup);
 
-						foreach (Track track in Tracks)
-							track.bApplyBrakes = true;
-					} else
-					{
-						foreach (Track track in Tracks)
-							track.bApplyBrakes = false;
-					}
-				}
-				else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list empty");
+				bApplyBrakes = true;
 			}
-			else Debuggar.Error ("BaseTrackModule in Brake(): Tracks list is null");
+			else
+			{
+				bApplyBrakes = false;
+			}
 		}
 
 		[KSPAction("Toggle Cruise Control", KSPActionGroup.None)]
 		protected void ToggleCruiseControl(KSPActionParam param)
 		{
-			if (Tracks != null)
+			if (param.type == KSPActionType.Activate)
 			{
-				if (Tracks.Count != 0)
-				{
-					if (param.type == KSPActionType.Activate)
-					{
-						bIsCruiseEnabled = true;
-						foreach (Track track in Tracks)
-							if (CruiseTargetRPM < track.RPM)
-								CruiseTargetRPM = track.RPM;
-					} else
-					{
-						bIsCruiseEnabled = false;
-						CruiseTargetRPM = 0;
-					}
-				}
-				else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list empty");
+				bIsCruiseEnabled = true;
+				CruiseTargetRPM = CruiseMonitorRPM;
 			}
-			else Debuggar.Error ("BaseTrackModule in ToggleCruiseControl(): Tracks list is null");
-		}
-
-		[KSPEvent(guiActive = true, guiName = "Update Suspension")]
-		protected void UpdateSuspension()
-		{
-			if (Tracks != null)
+			else
 			{
-				if (Tracks.Count != 0)
-				{
-					TrackConfig.WheelDummyConfig.SuspConfig.Damper = SuspensionDampingAdjustment;
-					TrackConfig.WheelDummyConfig.SuspConfig.Spring = SuspensionSpringAdjustment;
-					TrackConfig.WheelDummyConfig.SuspConfig.TravelCenter = SuspensionTargetPosAdjustment;
-					TrackConfig.WheelDummyConfig.SuspConfig.Travel = SuspensionTravelAdjustment;
-
-					foreach (Track track in Tracks)
-						track.UpdateSuspension ();
-				}
-				else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list empty");
+				bIsCruiseEnabled = false;
+				CruiseTargetRPM = 0;
 			}
-			else Debuggar.Error ("BaseTrackModule in UpdateSuspension(): Tracks list is null");
 		}
 
 		public virtual void FixedUpdate ()
 		{
-			if (HighLogic.LoadedSceneIsFlight)
+			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
-				SuspConfigContainer suspConfig = TrackConfig.WheelDummyConfig.SuspConfig;
-
-				dbgSuspensionDamping = suspConfig.Damper;
-				dbgSuspensionSpring = suspConfig.Spring;
-				dbgSuspensionTravel = suspConfig.Travel;
-				dbgSuspensionTargetPos = suspConfig.TravelCenter;
-
-				if (Tracks != null)
+				if (TrackConfig != null)
 				{
-					if (Tracks.Count != 0)
-					{
-						foreach (Track track in Tracks)
-						{
-							track.FixedUpdate ();
-						}
-					}
-					else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list empty");
+					TrackConfig.WheelDummyConfig.SuspConfig.Damper = SuspensionDampingAdjustment;
+					TrackConfig.WheelDummyConfig.SuspConfig.Spring = SuspensionSpringAdjustment;
+					TrackConfig.WheelDummyConfig.SuspConfig.Travel = SuspensionTravelAdjustment;
 				}
-				else Debuggar.Error ("BaseTrackModule in FixedUpdate(): Tracks list is null");
 			}
 		}
 
 		public virtual void Update ()
 		{
-			if (HighLogic.LoadedSceneIsFlight)
-			{
-				if (this.vessel != null)
-				{
-					if (this.vessel.isActiveVessel)
-					{
-						if (Tracks != null)
-						{
-							if (Tracks.Count != 0)
-							{
-								foreach (Track track in Tracks)
-									track.Update ();
-							} else
-								Debuggar.Error ("BaseTrackModule in Update(): Tracks list empty");
-						} else
-							Debuggar.Error ("BaseTrackModule in Update(): Tracks list is null");
-					}
-				}
-				else Debuggar.Error("BaseTrackModule in Update(): this.vessel is null FOR WHY SQUAD");
-			}
 		}
 
+		// wow I typed three slashes and monodevelop pulled this out of its ass
+		// IT KNOWS
+		// but really that's kind of neat it was able to autocomplete it as accurate as it did
+		/// <summary>
+		/// Consumes the resource.
+		/// </summary>
+		/// <returns><c>true</c>, if resource was consumed, <c>false</c> otherwise.</returns>
+		/// <param name="torque">Torque.</param>
 		protected bool ConsumeResource(float torque)
 		{
 			float amountToConsume = Mathf.Abs (torque * ConsumeResourceRate);

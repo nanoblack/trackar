@@ -55,31 +55,45 @@ namespace Trackar
 			if (HighLogic.LoadedSceneIsFlight)
 			{
 				LeftTrack = new Track (part.FindModelTransform (LeftTrackRoot), TrackConfig, false);
-				Tracks.Add (LeftTrack); // can this List be done away with yet? ugh
-
 				RightTrack = new Track (part.FindModelTransform (RightTrackRoot), TrackConfig, true);
-				Tracks.Add (RightTrack);
 			}
 			Debuggar.Message ("DualTrack in OnStart(): module successfully started");
 		}
 
+		public override void Update()
+		{
+			base.Update ();
+
+			if (HighLogic.LoadedSceneIsFlight)
+			{
+				if (this.vessel != null)
+				{
+					if (this.vessel.isActiveVessel)
+					{
+						if (RightTrack != null && LeftTrack != null)
+						{
+							RightTrack.Update ();
+							LeftTrack.Update ();
+						}
+					}
+				}
+			}
+		}
+
 		public override void FixedUpdate ()
 		{
-
 			base.FixedUpdate ();
 
 			if (HighLogic.LoadedSceneIsFlight && this.vessel.isActiveVessel)
 			{
 				if (LeftTrack != null && RightTrack != null)
 				{
-					float steer = 2 * this.vessel.ctrlState.wheelSteer;
+					float steer = 2 * this.vessel.ctrlState.wheelSteer; // I'm not sure this should be * 2 here anymore
 					float leftForward = this.vessel.ctrlState.wheelThrottle;
 					float rightForward = this.vessel.ctrlState.wheelThrottle;
 
 					LeftTrackRPM = LeftTrack.RPM;
 					RightTrackRPM = RightTrack.RPM;
-
-					//RevmatchError = LeftTrackRPM - RightTrackRPM;
 
 					LeftTorque = 0;
 					RightTorque = 0;
@@ -122,6 +136,20 @@ namespace Trackar
 
 					LeftTrack.Torque = LeftTorque;
 					RightTrack.Torque = RightTorque;
+
+					LeftTrack.UpdateSuspension ();
+					RightTrack.UpdateSuspension ();
+
+					LeftTrack.bApplyBrakes = bApplyBrakes;
+					RightTrack.bApplyBrakes = bApplyBrakes;
+
+					LeftTrack.FixedUpdate ();
+					RightTrack.FixedUpdate ();
+
+					if (RightTrackRPM >= LeftTrackRPM)
+						CruiseMonitorRPM = RightTrackRPM;
+					else
+						CruiseMonitorRPM = LeftTrackRPM;
 				}
 				else
 				{
