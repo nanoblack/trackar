@@ -1,7 +1,3 @@
-//=============================================================
-// UNSTABLE
-//=============================================================
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -141,9 +137,6 @@ namespace Trackar
 		{
 		}
 
-		// wow I typed three slashes and monodevelop pulled this out of its ass
-		// IT KNOWS
-		// but really that's kind of neat it was able to autocomplete it as accurate as it did
 		/// <summary>
 		/// Consumes the resource.
 		/// </summary>
